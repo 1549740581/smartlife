@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/smart_life?useLocalSessionState=true&autoReconnectForPools=true&useServerPrepStmts=false&rewriteBatchedStatements=true&serverTimezone=GMT%2b8&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3306/smart_life?useLocalSessionState=true&autoReconnectForPools=true&useServerPrepStmts=false&rewriteBatchedStatements=true&serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_general_ci
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver

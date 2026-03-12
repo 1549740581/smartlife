@@ -1,3 +1,35 @@
-.button-secondary {
-  margin-top: 12rpx;
+.filter-card {
+  background: #ffffff;
+  border-radius: 28rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 14rpx 34rpx rgba(21, 37, 63, 0.08);
+  border: 1rpx solid rgba(31, 111, 235, 0.06);
+}
+
+.search-input-light {
+  margin-top: 18rpx;
+}
+
+.search-picker {
+  margin-top: 18rpx;
+}
+
+.filter-pill-group {
+  margin-top: 22rpx;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 22rpx;
+}
+
+.filter-button {
+  flex: 1;
+  margin-top: 0;
+}
+
+.location-picker {
+  color: #314155;
 }

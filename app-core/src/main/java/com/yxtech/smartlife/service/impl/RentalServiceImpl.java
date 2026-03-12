@@ -8,6 +8,7 @@ import com.yxtech.smartlife.exception.NotFoundException;
 import com.yxtech.smartlife.repository.RentalInfoRepository;
 import com.yxtech.smartlife.repository.ReviewRecordRepository;
 import com.yxtech.smartlife.repository.UserRepository;
+import com.yxtech.smartlife.service.AddressService;
 import com.yxtech.smartlife.service.RentalService;
 import com.yxtech.smartlife.service.command.CreateRentalCommand;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class RentalServiceImpl implements RentalService {
     private final RentalInfoRepository rentalInfoRepository;
     private final ReviewRecordRepository reviewRecordRepository;
     private final UserRepository userRepository;
+    private final AddressService addressService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -34,15 +36,26 @@ public class RentalServiceImpl implements RentalService {
         userRepository.findByIdAndDeletedFalse(command.getPublisherUserId())
                 .orElseThrow(() -> new NotFoundException("publisher user not found"));
 
+        String city = normalizeCity(command.getCity());
+        String district = trimToNull(command.getDistrict());
+        String street = trimToNull(command.getStreet());
+        String communityName = trimToNull(command.getCommunityName());
+        if (!addressService.exists(city, district, street, communityName)) {
+            throw new IllegalArgumentException("selected address is not supported");
+        }
+
         RentalInfo rentalInfo = new RentalInfo();
         rentalInfo.setPublisherUserId(command.getPublisherUserId());
         rentalInfo.setRentalType(command.getRentalType());
-        rentalInfo.setTitle(command.getTitle());
-        rentalInfo.setDescription(command.getDescription());
+        rentalInfo.setTitle(trimToNull(command.getTitle()));
+        rentalInfo.setDescription(trimToNull(command.getDescription()));
         rentalInfo.setPrice(command.getPrice());
-        rentalInfo.setContactName(command.getContactName());
-        rentalInfo.setContactPhone(command.getContactPhone());
-        rentalInfo.setCommunityName(command.getCommunityName());
+        rentalInfo.setContactName(trimToNull(command.getContactName()));
+        rentalInfo.setContactPhone(trimToNull(command.getContactPhone()));
+        rentalInfo.setCity(city);
+        rentalInfo.setDistrict(district);
+        rentalInfo.setStreet(street);
+        rentalInfo.setCommunityName(communityName);
         rentalInfo.setImageUrls(toJson(command.getImageUrls()));
         rentalInfo.setStatus(RentalInfo.RentalStatus.PENDING);
         return rentalInfoRepository.save(rentalInfo);
@@ -50,7 +63,27 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public List<RentalInfo> findPublicRentals() {
-        return rentalInfoRepository.findByStatusAndDeletedFalseOrderByCreatedAtDesc(RentalInfo.RentalStatus.APPROVED);
+        return searchPublicRentals(null, null, null, null, null, null);
+    }
+
+    @Override
+    public List<RentalInfo> searchPublicRentals(
+            String keyword,
+            RentalInfo.RentalType rentalType,
+            String city,
+            String district,
+            String street,
+            String communityName
+    ) {
+        return rentalInfoRepository.searchPublicRentals(
+                RentalInfo.RentalStatus.APPROVED,
+                trimToNull(keyword),
+                rentalType,
+                trimToNull(city),
+                trimToNull(district),
+                trimToNull(street),
+                trimToNull(communityName)
+        );
     }
 
     @Override
@@ -65,10 +98,7 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public List<RentalInfo> findPublicRentalsByType(RentalInfo.RentalType rentalType) {
-        return rentalInfoRepository.findByRentalTypeAndStatusAndDeletedFalseOrderByCreatedAtDesc(
-                rentalType,
-                RentalInfo.RentalStatus.APPROVED
-        );
+        return searchPublicRentals(null, rentalType, null, null, null, null);
     }
 
     @Override
@@ -173,5 +203,23 @@ public class RentalServiceImpl implements RentalService {
         } catch (JsonProcessingException ex) {
             throw new IllegalArgumentException("image urls serialization failed");
         }
+    }
+
+    private String normalizeCity(String city) {
+        String normalized = trimToNull(city);
+        if (!StringUtils.hasText(normalized)) {
+            return "杭州";
+        }
+        if (!"杭州".equals(normalized)) {
+            throw new IllegalArgumentException("currently only Hangzhou is supported");
+        }
+        return normalized;
+    }
+
+    private String trimToNull(String value) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        return value.trim();
     }
 }

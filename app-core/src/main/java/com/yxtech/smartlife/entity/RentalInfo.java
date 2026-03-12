@@ -39,6 +39,15 @@ public class RentalInfo extends BaseEntity {
     @Column(name = "contact_phone", nullable = false, length = 32)
     private String contactPhone;
 
+    @Column(name = "city", nullable = false, length = 64)
+    private String city;
+
+    @Column(name = "district", length = 64)
+    private String district;
+
+    @Column(name = "street", length = 128)
+    private String street;
+
     @Column(name = "community_name", length = 128)
     private String communityName;
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -38,6 +39,9 @@ public class RentalController {
                 .price(request.getPrice())
                 .contactName(request.getContactName())
                 .contactPhone(request.getContactPhone())
+                .city(request.getCity())
+                .district(request.getDistrict())
+                .street(request.getStreet())
                 .communityName(request.getCommunityName())
                 .imageUrls(request.getImageUrls())
                 .build();
@@ -46,8 +50,15 @@ public class RentalController {
     }
 
     @GetMapping
-    public Result<List<RentalDTO>> getPublicRentals() {
-        return Result.success(rentalService.findPublicRentals().stream()
+    public Result<List<RentalDTO>> getPublicRentals(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "type", required = false) RentalInfo.RentalType type,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "district", required = false) String district,
+            @RequestParam(value = "street", required = false) String street,
+            @RequestParam(value = "communityName", required = false) String communityName
+    ) {
+        return Result.success(rentalService.searchPublicRentals(keyword, type, city, district, street, communityName).stream()
                 .map(rental -> RentalDTO.fromEntity(rental, objectMapper))
                 .toList());
     }
@@ -58,8 +69,15 @@ public class RentalController {
     }
 
     @GetMapping("/type/{type}")
-    public Result<List<RentalDTO>> getPublicRentalsByType(@PathVariable("type") RentalInfo.RentalType type) {
-        return Result.success(rentalService.findPublicRentalsByType(type).stream()
+    public Result<List<RentalDTO>> getPublicRentalsByType(
+            @PathVariable("type") RentalInfo.RentalType type,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "district", required = false) String district,
+            @RequestParam(value = "street", required = false) String street,
+            @RequestParam(value = "communityName", required = false) String communityName
+    ) {
+        return Result.success(rentalService.searchPublicRentals(keyword, type, city, district, street, communityName).stream()
                 .map(rental -> RentalDTO.fromEntity(rental, objectMapper))
                 .toList());
     }

@@ -52,13 +52,18 @@ class RentalServiceContainerTest extends AbstractContainerIntegrationTest {
                 .price(BigDecimal.valueOf(3500))
                 .contactName("张三")
                 .contactPhone("13800000000")
-                .communityName("阳光小区")
+                .city("杭州")
+                .district("滨江区")
+                .street("长河街道")
+                .communityName("卓悦华庭")
                 .imageUrls(List.of("https://img.test/a.jpg"))
                 .build());
 
         RentalInfo persisted = rentalInfoRepository.findById(saved.getId()).orElseThrow();
         assertNotNull(persisted.getId());
         assertEquals(RentalInfo.RentalStatus.PENDING, persisted.getStatus());
+        assertEquals("杭州", persisted.getCity());
+        assertEquals("滨江区", persisted.getDistrict());
         assertEquals("[\"https://img.test/a.jpg\"]", persisted.getImageUrls());
     }
 
@@ -73,6 +78,10 @@ class RentalServiceContainerTest extends AbstractContainerIntegrationTest {
                 .price(BigDecimal.valueOf(500))
                 .contactName("李四")
                 .contactPhone("13900000000")
+                .city("杭州")
+                .district("滨江区")
+                .street("长河街道")
+                .communityName("卓悦华庭")
                 .imageUrls(List.of())
                 .build());
 

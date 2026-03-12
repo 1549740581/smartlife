@@ -21,6 +21,9 @@ public class AdminRentalDTO {
     private BigDecimal price;
     private String contactName;
     private String contactPhone;
+    private String city;
+    private String district;
+    private String street;
     private String communityName;
     private List<String> imageUrls;
     private RentalInfo.RentalStatus status;
@@ -39,6 +42,9 @@ public class AdminRentalDTO {
         dto.setPrice(rentalInfo.getPrice());
         dto.setContactName(rentalInfo.getContactName());
         dto.setContactPhone(rentalInfo.getContactPhone());
+        dto.setCity(rentalInfo.getCity());
+        dto.setDistrict(rentalInfo.getDistrict());
+        dto.setStreet(rentalInfo.getStreet());
         dto.setCommunityName(rentalInfo.getCommunityName());
         dto.setImageUrls(parseImageUrls(rentalInfo.getImageUrls(), objectMapper));
         dto.setStatus(rentalInfo.getStatus());

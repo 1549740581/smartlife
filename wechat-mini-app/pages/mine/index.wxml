@@ -41,6 +41,7 @@
         </view>
         <view class="record-desc">{{item.description}}</view>
         <view class="record-meta">{{item.typeLabel}} · {{item.priceText}}</view>
+        <view class="record-meta">位置：{{item.locationText || '杭州 / 未填写小区'}}</view>
         <view class="record-meta">联系人：{{item.contactName}} {{item.contactPhone}}</view>
         <view class="record-reason" wx:if="{{item.rejectReason}}">驳回原因：{{item.rejectReason}}</view>
       </view>

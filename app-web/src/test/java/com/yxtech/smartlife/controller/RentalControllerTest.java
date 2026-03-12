@@ -53,25 +53,48 @@ class RentalControllerTest {
                                   "price":3200,
                                   "contactName":"张三",
                                   "contactPhone":"13800000000",
-                                  "communityName":"智慧小区",
+                                  "city":"杭州",
+                                  "district":"滨江区",
+                                  "street":"长河街道",
+                                  "communityName":"卓悦华庭",
                                   "imageUrls":["https://img/a.jpg"]
                                 }
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.status").value("PENDING"))
-                .andExpect(jsonPath("$.data.title").value("两居室"));
+                .andExpect(jsonPath("$.data.title").value("两居室"))
+                .andExpect(jsonPath("$.data.city").value("杭州"));
     }
 
     @Test
     void getPublicRentalsShouldReturnApprovedList() throws Exception {
         RentalInfo rentalInfo = buildRental();
         rentalInfo.setStatus(RentalInfo.RentalStatus.APPROVED);
-        when(rentalService.findPublicRentals()).thenReturn(List.of(rentalInfo));
+        when(rentalService.searchPublicRentals(null, null, null, null, null, null)).thenReturn(List.of(rentalInfo));
 
         mockMvc.perform(get("/api/rentals"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].status").value("APPROVED"))
-                .andExpect(jsonPath("$.data[0].rentalType").value("HOUSE"));
+                .andExpect(jsonPath("$.data[0].rentalType").value("HOUSE"))
+                .andExpect(jsonPath("$.data[0].city").value("杭州"));
+    }
+
+    @Test
+    void getPublicRentalsShouldSupportKeywordSearch() throws Exception {
+        RentalInfo rentalInfo = buildRental();
+        rentalInfo.setStatus(RentalInfo.RentalStatus.APPROVED);
+        when(rentalService.searchPublicRentals("卓悦华庭", RentalInfo.RentalType.HOUSE, "杭州", "滨江区", "长河街道", "卓悦华庭"))
+                .thenReturn(List.of(rentalInfo));
+
+        mockMvc.perform(get("/api/rentals")
+                        .param("keyword", "卓悦华庭")
+                        .param("type", "HOUSE")
+                        .param("city", "杭州")
+                        .param("district", "滨江区")
+                        .param("street", "长河街道")
+                        .param("communityName", "卓悦华庭"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].communityName").value("卓悦华庭"));
     }
 
     @Test
@@ -108,6 +131,10 @@ class RentalControllerTest {
         rentalInfo.setPrice(BigDecimal.valueOf(3200));
         rentalInfo.setContactName("张三");
         rentalInfo.setContactPhone("13800000000");
+        rentalInfo.setCity("杭州");
+        rentalInfo.setDistrict("滨江区");
+        rentalInfo.setStreet("长河街道");
+        rentalInfo.setCommunityName("卓悦华庭");
         rentalInfo.setImageUrls("[\"https://img/a.jpg\"]");
         rentalInfo.setStatus(RentalInfo.RentalStatus.PENDING);
         return rentalInfo;

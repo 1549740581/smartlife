@@ -11,7 +11,7 @@
 - Spring Web
 - Spring Security
 - Spring Data JPA
-- MySQL 8.0.33
+- MySQL 8.0
 - Redis
 - Liquibase
 - Maven
@@ -25,14 +25,13 @@
 
 - JUnit 5
 - Testcontainers
-- Kotest
-- MockK
+- Mockito
 
 ### 前端
 
 - 微信小程序原生开发
-- React
-- TypeScript
+- JavaScript
+- WXML / WXSS
 
 ## 2. 依赖策略
 

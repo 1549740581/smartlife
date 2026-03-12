@@ -11,6 +11,15 @@ public interface RentalService {
 
     List<RentalInfo> findPublicRentals();
 
+    List<RentalInfo> searchPublicRentals(
+            String keyword,
+            RentalInfo.RentalType rentalType,
+            String city,
+            String district,
+            String street,
+            String communityName
+    );
+
     RentalInfo findPublicRentalById(Long rentalId);
 
     List<RentalInfo> findPublicRentalsByType(RentalInfo.RentalType rentalType);

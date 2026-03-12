@@ -11,7 +11,7 @@
     <view class="detail-badges">
       <view class="detail-badge">{{rental.typeLabel}}</view>
       <view class="detail-badge">{{rental.priceText}}</view>
-      <view class="detail-badge">{{rental.communityName || '未填写小区'}}</view>
+      <view class="detail-badge">{{rental.locationText || '杭州 / 未填写小区'}}</view>
     </view>
   </view>
 

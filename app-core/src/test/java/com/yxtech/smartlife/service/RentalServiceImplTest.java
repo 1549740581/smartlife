@@ -7,6 +7,7 @@ import com.yxtech.smartlife.entity.User;
 import com.yxtech.smartlife.repository.RentalInfoRepository;
 import com.yxtech.smartlife.repository.ReviewRecordRepository;
 import com.yxtech.smartlife.repository.UserRepository;
+import com.yxtech.smartlife.service.AddressService;
 import com.yxtech.smartlife.service.command.CreateRentalCommand;
 import com.yxtech.smartlife.service.impl.RentalServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,9 @@ class RentalServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AddressService addressService;
+
     private RentalServiceImpl rentalService;
 
     @BeforeEach
@@ -46,6 +50,7 @@ class RentalServiceImplTest {
                 rentalInfoRepository,
                 reviewRecordRepository,
                 userRepository,
+                addressService,
                 new ObjectMapper()
         );
     }
@@ -55,6 +60,7 @@ class RentalServiceImplTest {
         User user = new User();
         user.setId(1L);
         when(userRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(user));
+        when(addressService.exists("杭州", "滨江区", "长河街道", "卓悦华庭")).thenReturn(true);
         when(rentalInfoRepository.save(any(RentalInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         RentalInfo rentalInfo = rentalService.createRental(CreateRentalCommand.builder()
@@ -65,11 +71,37 @@ class RentalServiceImplTest {
                 .price(BigDecimal.valueOf(3200))
                 .contactName("张三")
                 .contactPhone("13800000000")
+                .district("滨江区")
+                .street("长河街道")
+                .communityName("卓悦华庭")
                 .imageUrls(List.of("https://img/a.jpg"))
                 .build());
 
         assertEquals(RentalInfo.RentalStatus.PENDING, rentalInfo.getStatus());
         assertEquals(RentalInfo.RentalType.HOUSE, rentalInfo.getRentalType());
+        assertEquals("杭州", rentalInfo.getCity());
+        assertEquals("卓悦华庭", rentalInfo.getCommunityName());
+    }
+
+    @Test
+    void createRentalShouldRejectUnsupportedCity() {
+        User user = new User();
+        user.setId(1L);
+        when(userRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(user));
+
+        assertThrows(IllegalArgumentException.class, () -> rentalService.createRental(CreateRentalCommand.builder()
+                .publisherUserId(1L)
+                .rentalType(RentalInfo.RentalType.HOUSE)
+                .title("两居室")
+                .description("近地铁")
+                .price(BigDecimal.valueOf(3200))
+                .contactName("张三")
+                .contactPhone("13800000000")
+                .city("上海")
+                .district("滨江区")
+                .street("长河街道")
+                .communityName("卓悦华庭")
+                .build()));
     }
 
     @Test
@@ -136,5 +168,32 @@ class RentalServiceImplTest {
         verify(reviewRecordRepository).save(captor.capture());
         assertEquals("OFFLINE", captor.getValue().getAction());
         assertEquals("OFFLINE", captor.getValue().getToStatus());
+    }
+
+    @Test
+    void searchPublicRentalsShouldDelegateToRepository() {
+        RentalInfo rentalInfo = new RentalInfo();
+        rentalInfo.setId(1L);
+        when(rentalInfoRepository.searchPublicRentals(
+                RentalInfo.RentalStatus.APPROVED,
+                "阳光花园",
+                RentalInfo.RentalType.HOUSE,
+                "杭州",
+                "滨江区",
+                "长河街道",
+                "卓悦华庭"
+        )).thenReturn(List.of(rentalInfo));
+
+        List<RentalInfo> results = rentalService.searchPublicRentals(
+                "阳光花园",
+                RentalInfo.RentalType.HOUSE,
+                "杭州",
+                "滨江区",
+                "长河街道",
+                "卓悦华庭"
+        );
+
+        assertEquals(1, results.size());
+        assertEquals(1L, results.get(0).getId());
     }
 }

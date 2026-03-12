@@ -34,7 +34,7 @@
 
 说明：
 
-- 当前模块已存在，但实现尚未展开
+- 当前已实现管理员登录、退出、待审核查询、全部列表、详情、审核和下架接口
 
 ### `app-starter`
 
@@ -52,18 +52,18 @@
 
 ## 3. 逻辑分层
 
-建议采用以下分层：
+当前采用以下分层：
 
 1. Controller / API
-2. Application Service
-3. Domain Model
-4. dao
-5. Infrastructure
+2. Service
+3. Entity / DTO
+4. Repository
+5. Config / Auth / Infrastructure
 
 约束：
 
 - Controller 不直接操作数据库
-- dao 不承载业务编排
+- Repository 不承载业务编排
 - Service 层负责状态流转和业务规则
 
 ## 4. 关键业务对象
@@ -71,13 +71,14 @@
 - User
 - Admin
 - RentalInfo
-- ReviewRecord（建议后续引入）
+- ReviewRecord
+- AddressOption
 
 ## 5. 关键流程
 
 ### 发布流程
 
-用户提交租赁信息后进入 `PENDING`，等待管理员审核。
+用户提交租赁信息后进入 `PENDING`，等待管理员审核。发布时地址必须从地址表中选择，当前城市固定为杭州。
 
 ### 审核流程
 
@@ -86,12 +87,14 @@
 ## 6. 外部依赖
 
 - MySQL：核心业务数据
-- Redis：缓存或会话能力
+- Redis：管理员会话持久化
 - 微信小程序平台：登录与前端运行环境
 - Swagger / OpenAPI：接口文档
+- Testcontainers：MySQL / Redis 集成测试
 
 ## 7. 当前未决设计
 
-- 鉴权方案是 Session、JWT 还是混合模式
+- 真实微信登录替换模拟登录的接入方案
 - 图片上传到本地、数据库还是对象存储
 - 管理端是否需要独立前端项目
+- 多城市地址维护和后台配置方式

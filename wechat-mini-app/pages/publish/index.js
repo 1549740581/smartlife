@@ -1,6 +1,8 @@
 const { request, uploadFile } = require('../../utils/request');
+const { buildPickerRange, buildNextPickerState, findPickerValue, resolveSelection } = require('../../utils/address');
 
 const PHONE_PATTERN = /^[0-9\-+\s]{6,20}$/;
+const DEFAULT_CITY = '杭州';
 
 function chooseImageFiles(count) {
   return new Promise((resolve, reject) => {
@@ -21,8 +23,7 @@ function trimForm(form) {
     description: (form.description || '').trim(),
     price: (form.price || '').trim(),
     contactName: (form.contactName || '').trim(),
-    contactPhone: (form.contactPhone || '').trim(),
-    communityName: (form.communityName || '').trim()
+    contactPhone: (form.contactPhone || '').trim()
   };
 }
 
@@ -54,6 +55,9 @@ function validateForm(form) {
   if (!PHONE_PATTERN.test(form.contactPhone)) {
     return '联系电话格式不正确';
   }
+  if (!form.city || !form.district || !form.street || !form.communityName) {
+    return '请选择完整的小区地址';
+  }
   return '';
 }
 
@@ -67,15 +71,25 @@ Page({
     typeIndex: 0,
     uploading: false,
     submitting: false,
+    addressTree: [],
+    addressRange: [[], [], [], []],
+    addressValue: [0, 0, 0, 0],
+    selectedAddressText: '请选择杭州的小区地址',
     form: {
+      city: DEFAULT_CITY,
+      district: '',
+      street: '',
+      communityName: '',
       title: '',
       description: '',
       price: '',
       contactName: '',
       contactPhone: '',
-      communityName: '',
       imageUrls: []
     }
+  },
+  onLoad() {
+    this.loadAddressTree();
   },
   onShow() {
     const user = getApp().getCurrentUser();
@@ -90,6 +104,31 @@ Page({
       });
     }
   },
+  async loadAddressTree() {
+    try {
+      const tree = await request({ url: '/api/addresses/tree' });
+      const nextValue = findPickerValue(tree || [], {
+        city: this.data.form.city,
+        district: this.data.form.district,
+        street: this.data.form.street,
+        communityName: this.data.form.communityName
+      });
+      const pickerState = buildPickerRange(tree || [], nextValue);
+      const selection = resolveSelection(tree || [], pickerState.value);
+      this.setData({
+        addressTree: tree || [],
+        addressRange: pickerState.range,
+        addressValue: pickerState.value,
+        selectedAddressText: selection.text || '请选择杭州的小区地址',
+        'form.city': selection.city || DEFAULT_CITY,
+        'form.district': selection.district || '',
+        'form.street': selection.street || '',
+        'form.communityName': selection.communityName || ''
+      });
+    } catch (err) {
+      wx.showToast({ title: String(err), icon: 'none' });
+    }
+  },
   bindField(e) {
     const field = e.currentTarget.dataset.field;
     this.setData({
@@ -98,6 +137,29 @@ Page({
   },
   onTypeChange(e) {
     this.setData({ typeIndex: Number(e.detail.value) });
+  },
+  onAddressColumnChange(e) {
+    const pickerState = buildNextPickerState(
+      this.data.addressTree,
+      this.data.addressValue,
+      Number(e.detail.column),
+      Number(e.detail.value)
+    );
+    this.setData({
+      addressRange: pickerState.range,
+      addressValue: pickerState.value
+    });
+  },
+  onAddressChange(e) {
+    const selection = resolveSelection(this.data.addressTree, e.detail.value);
+    this.setData({
+      addressValue: selection.value,
+      selectedAddressText: selection.text || '请选择杭州的小区地址',
+      'form.city': selection.city || DEFAULT_CITY,
+      'form.district': selection.district || '',
+      'form.street': selection.street || '',
+      'form.communityName': selection.communityName || ''
+    });
   },
   async chooseImages() {
     const currentCount = this.data.form.imageUrls.length;
@@ -153,19 +215,21 @@ Page({
     if (this.data.submitting) {
       return;
     }
-    const normalizedForm = trimForm(this.data.form);
+
+    const normalizedForm = {
+      ...this.data.form,
+      ...trimForm(this.data.form)
+    };
     const validationMessage = validateForm(normalizedForm);
     if (validationMessage) {
       wx.showToast({ title: validationMessage, icon: 'none' });
       return;
     }
+
     try {
       this.setData({
         submitting: true,
-        form: {
-          ...this.data.form,
-          ...normalizedForm
-        }
+        form: normalizedForm
       });
       await request({
         url: '/api/rentals',
@@ -178,20 +242,29 @@ Page({
           price: Number(normalizedForm.price),
           contactName: normalizedForm.contactName,
           contactPhone: normalizedForm.contactPhone,
+          city: normalizedForm.city,
+          district: normalizedForm.district,
+          street: normalizedForm.street,
           communityName: normalizedForm.communityName,
-          imageUrls: this.data.form.imageUrls
+          imageUrls: normalizedForm.imageUrls
         }
       });
       wx.showToast({ title: '提交成功', icon: 'success' });
+      const resetSelection = resolveSelection(this.data.addressTree, [0, 0, 0, 0]);
       this.setData({
         submitting: false,
+        addressValue: resetSelection.value,
+        selectedAddressText: resetSelection.text || '请选择杭州的小区地址',
         form: {
+          city: resetSelection.city || DEFAULT_CITY,
+          district: resetSelection.district || '',
+          street: resetSelection.street || '',
+          communityName: resetSelection.communityName || '',
           title: '',
           description: '',
           price: '',
           contactName: user.nickname || '',
           contactPhone: '',
-          communityName: '',
           imageUrls: []
         }
       });
@@ -201,8 +274,6 @@ Page({
     } catch (err) {
       this.setData({ submitting: false });
       wx.showToast({ title: String(err), icon: 'none' });
-      return;
     }
-    this.setData({ submitting: false });
   }
 });

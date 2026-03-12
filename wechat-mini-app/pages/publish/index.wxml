@@ -7,9 +7,14 @@
 
   <view class="card">
     <view class="field">
+      <text class="label">城市</text>
+      <view class="readonly-field">{{form.city}}</view>
+      <view class="meta helper-text">当前版本固定为杭州，后续再支持多城市联动选择。</view>
+    </view>
+    <view class="field">
       <text class="label">类型</text>
-      <picker class="picker" mode="selector" range="{{typeOptions}}" range-key="label" bindchange="onTypeChange">
-        <view class="picker">{{typeOptions[typeIndex].label}}</view>
+      <picker class="picker-field" mode="selector" range="{{typeOptions}}" range-key="label" bindchange="onTypeChange">
+        <view class="picker-value">{{typeOptions[typeIndex].label}}</view>
       </picker>
     </view>
     <view class="field">
@@ -33,8 +38,17 @@
       <input class="input" type="number" placeholder="请输入手机号或常用联系电话" maxlength="20" bindinput="bindField" data-field="contactPhone" value="{{form.contactPhone}}" />
     </view>
     <view class="field">
-      <text class="label">区域 / 小区</text>
-      <input class="input" placeholder="例如：阳光花园 3 栋 / 地铁口附近" maxlength="40" bindinput="bindField" data-field="communityName" value="{{form.communityName}}" />
+      <text class="label">区县 / 街道 / 小区</text>
+      <picker
+        class="picker-field"
+        mode="multiSelector"
+        range="{{addressRange}}"
+        value="{{addressValue}}"
+        bindchange="onAddressChange"
+        bindcolumnchange="onAddressColumnChange"
+      >
+        <view class="picker-value location-picker">{{selectedAddressText}}</view>
+      </picker>
     </view>
     <view class="field">
       <text class="label">图片</text>

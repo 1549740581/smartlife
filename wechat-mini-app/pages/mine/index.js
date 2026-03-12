@@ -49,7 +49,8 @@ Page({
           statusClass: (item.status || '').toLowerCase(),
           typeLabel: TYPE_LABELS[item.rentalType] || item.rentalType,
           statusLabel: STATUS_LABELS[item.status] || item.status,
-          priceText: item.price ? `¥${item.price}` : '价格面议'
+          priceText: item.price ? `¥${item.price}` : '价格面议',
+          locationText: [item.city, item.district, item.street, item.communityName].filter(Boolean).join(' / ')
         }))
       });
     } catch (err) {

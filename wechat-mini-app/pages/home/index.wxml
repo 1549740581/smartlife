@@ -8,11 +8,37 @@
       <view class="identity-badge">{{identityText}}</view>
     </view>
     <view class="hero-copy">浏览社区里已经审核通过的房屋、车位和闲置物品，快速找到靠谱信息。</view>
-    <view class="pill-group">
+  </view>
+
+  <view class="filter-card">
+    <view class="section-title">筛选搜索</view>
+    <input
+      class="input search-input-light"
+      placeholder="搜索标题、描述或联系方式"
+      confirm-type="search"
+      bindinput="onKeywordInput"
+      bindconfirm="onKeywordConfirm"
+      value="{{keyword}}"
+    />
+    <picker
+      class="picker-field search-picker"
+      mode="multiSelector"
+      range="{{addressRange}}"
+      value="{{addressValue}}"
+      bindchange="onAddressChange"
+      bindcolumnchange="onAddressColumnChange"
+    >
+      <view class="picker-value location-picker">{{selectedAddressText}}</view>
+    </picker>
+    <view class="pill-group filter-pill-group">
       <view class="pill {{activeType === 'ALL' ? 'pill-active' : ''}}" data-type="ALL" bindtap="switchType">全部</view>
       <view class="pill {{activeType === 'HOUSE' ? 'pill-active' : ''}}" data-type="HOUSE" bindtap="switchType">房屋</view>
       <view class="pill {{activeType === 'PARKING' ? 'pill-active' : ''}}" data-type="PARKING" bindtap="switchType">车位</view>
       <view class="pill {{activeType === 'ITEM' ? 'pill-active' : ''}}" data-type="ITEM" bindtap="switchType">闲置物品</view>
+    </view>
+    <view class="filter-actions">
+      <button class="button filter-button" bindtap="search">搜索</button>
+      <button class="button button-secondary filter-button" bindtap="clearFilters">重置</button>
     </view>
   </view>
 
@@ -34,7 +60,7 @@
       </view>
       <view class="listing-title">{{item.title}}</view>
       <view class="listing-desc">{{item.description}}</view>
-      <view class="listing-meta">所在区域：{{item.communityName || '未填写'}}</view>
+      <view class="listing-meta">所在位置：{{item.locationText || '杭州 / 未填写'}}</view>
       <view class="listing-contact">
         <view class="contact-chip">{{item.contactName}}</view>
         <view class="contact-chip">{{item.contactPhone}}</view>

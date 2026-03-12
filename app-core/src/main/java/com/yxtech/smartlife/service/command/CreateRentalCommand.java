@@ -17,6 +17,9 @@ public class CreateRentalCommand {
     BigDecimal price;
     String contactName;
     String contactPhone;
+    String city;
+    String district;
+    String street;
     String communityName;
     List<String> imageUrls;
 }

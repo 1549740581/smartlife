@@ -15,7 +15,12 @@ public abstract class AbstractContainerIntegrationTest {
     private static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>("mysql:8.0.36")
             .withDatabaseName("smart_life_test")
             .withUsername("test")
-            .withPassword("test");
+            .withPassword("test")
+            .withCommand(
+                    "--character-set-server=utf8mb4",
+                    "--collation-server=utf8mb4_general_ci",
+                    "--default-time-zone=+08:00"
+            );
 
     private static final GenericContainer<?> REDIS_CONTAINER = new GenericContainer<>(DockerImageName.parse("redis:7.2.4"))
             .withExposedPorts(6379);

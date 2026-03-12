@@ -56,7 +56,8 @@ Page({
           statusClass: ((rental && rental.status) || '').toLowerCase(),
           statusText: buildStatusText(rental),
           typeLabel: TYPE_LABELS[rental.rentalType] || rental.rentalType,
-          priceText: rental.price ? `¥${rental.price}` : '价格面议'
+          priceText: rental.price ? `¥${rental.price}` : '价格面议',
+          locationText: [rental.city, rental.district, rental.street, rental.communityName].filter(Boolean).join(' / ')
         }
       });
     } catch (err) {

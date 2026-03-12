@@ -13,9 +13,10 @@
 
 ```json
 {
-  "code": "OK",
+  "code": 200,
   "message": "success",
-  "data": {}
+  "data": {},
+  "timestamp": 1710000000000
 }
 ```
 
@@ -23,7 +24,7 @@
 
 ```json
 {
-  "code": "VALIDATION_ERROR",
+  "code": 400,
   "message": "title must not be blank",
   "data": null
 }
@@ -80,7 +81,10 @@
   "price": 4200,
   "contactName": "张三",
   "contactPhone": "13800000000",
-  "communityName": "阳光花园",
+  "city": "杭州",
+  "district": "滨江区",
+  "street": "长河街道",
+  "communityName": "卓悦华庭",
   "imageUrls": [
     "https://example.com/image-1.jpg"
   ]
@@ -92,7 +96,53 @@
 - `rentalType` 当前支持 `HOUSE`、`PARKING`、`ITEM`
 - 发布成功后状态默认为 `PENDING`
 - 小程序发布页会在调用接口前进行标题、描述、价格、联系人、联系电话的前端校验
+- 发布地址必须命中地址表中存在的地址组合
+- 当前 `city` 仅支持 `杭州`
 - 提交成功后前端回到个人中心查看发布状态
+
+### 地址树查询
+
+- `GET /api/addresses/tree`
+
+响应示例：
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "label": "杭州",
+      "value": "杭州",
+      "children": [
+        {
+          "label": "滨江区",
+          "value": "滨江区",
+          "children": [
+            {
+              "label": "长河街道",
+              "value": "长河街道",
+              "children": [
+                {
+                  "label": "卓悦华庭",
+                  "value": "卓悦华庭",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timestamp": 1710000000000
+}
+```
+
+说明：
+
+- 地址数据来自 MySQL `address_option` 表
+- 当前仅初始化一条杭州地址
 
 ### 上传图片
 
@@ -111,7 +161,8 @@
 - 仅返回 `APPROVED` 数据
 - 访客与登录用户查询结果一致
 - `type` 允许值为 `HOUSE`、`PARKING`、`ITEM`
-- 小程序公开列表通过底部 `生活广场` 入口承载，支持按类型筛选
+- 支持查询参数：`keyword`、`type`、`city`、`district`、`street`、`communityName`
+- 小程序公开列表通过底部 `生活广场` 入口承载，支持关键词、类型和地址筛选
 
 ### 查询我的发布
 
@@ -142,7 +193,7 @@
 
 ```json
 {
-  "code": "OK",
+  "code": 200,
   "message": "success",
   "data": {
     "adminId": 1,
@@ -158,6 +209,11 @@
 - 小程序 UI 层只对指定审核员用户展示“后台审核”入口
 - 后端管理接口仍以 `X-Admin-Token` 作为鉴权依据
 - 当前审核入口集成在小程序 `个人中心` 中，不单独提供独立后台前端
+- 会话保存在 Redis 中，服务重启后未过期 token 仍可用
+
+### 管理员退出
+
+- `POST /api/admin/logout`
 
 ### 获取待审核列表
 

@@ -34,6 +34,14 @@ public class CreateRentalRequest {
     @NotBlank
     private String contactPhone;
 
+    @NotBlank
+    private String city;
+
+    private String district;
+
+    private String street;
+
+    @NotBlank
     private String communityName;
 
     private List<String> imageUrls;

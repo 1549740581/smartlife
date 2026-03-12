@@ -80,7 +80,14 @@ docker compose up -d
 说明：
 
 - 数据库结构会在应用启动时由 Liquibase 自动创建
+- 当前使用单份 Liquibase baseline：`app-core/src/main/resources/db/changelog/v1.0/000-baseline.sql`
 - 默认数据库账号见 `.env.example`
+- MySQL 默认字符集为 `utf8mb4`，校验规则为 `utf8mb4_general_ci`
+
+## 文档维护约束
+
+- 以后每次代码改动都必须同步更新 `docs/product/prd.md` 和相关正式文档
+- 文档必须与当前可运行代码保持一致，不能在代码变更后滞后
 
 ### 2. 启动后端服务
 

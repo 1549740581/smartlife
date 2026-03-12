@@ -28,6 +28,7 @@
 - 响应中同时返回 `expiresAt`
 - 管理端请求通过 `X-Admin-Token` 头传递令牌
 - 令牌由 Redis 会话服务维护，并带滑动过期时间
+- Redis 开启持久化，保证 Java 服务重启后管理员未过期会话仍可继续使用
 - 支持主动退出登录
 - 管理侧鉴权统一由 MVC 拦截器完成，控制器通过请求上下文读取当前管理员
 
@@ -50,8 +51,16 @@
 ### RentalInfo
 
 - 用单表承载房屋与车位
+- 当前也承载闲置物品
 - 通过 `rentalType` 区分类型
 - 图片以 JSON 字符串落库，避免首期引入对象存储
+
+### AddressOption
+
+- 地址数据维护在 MySQL `address_option` 表
+- 当前采用叶子表存储 `city / district / street / community_name`
+- 用户侧通过 `/api/addresses/tree` 获取树形结构
+- 当前城市能力限制为杭州，后续再扩展多城市
 
 ### ReviewRecord
 
@@ -64,6 +73,7 @@
 
 - 小程序底部固定两个一级入口：`生活广场`、`个人中心`
 - `生活广场` 承载公开列表和类型筛选
+- `生活广场` 当前支持关键词、类型、地址多条件筛选
 - `个人中心` 承载用户信息、我要发布、我的发布、账号切换和审核入口
 - `后台审核` 为审核员条件展示页面入口，不直接出现在公共导航中
 
@@ -71,6 +81,7 @@
 
 - `/api/wechat/login`
 - `/api/users/*`
+- `/api/addresses/tree`
 - `/api/rentals`
 - `/api/rentals/type/{type}`
 - `/api/rentals/user/{userId}`
@@ -78,6 +89,7 @@
 ### 管理侧
 
 - `/api/admin/login`
+- `/api/admin/logout`
 - `/api/admin/rentals/pending`
 - `/api/admin/rentals`
 - `/api/admin/rentals/{id}/review`
@@ -121,6 +133,17 @@
 - 当前已形成“访客浏览 -> 模拟登录 -> 发布 -> 审核 -> 浏览”的本地联调闭环
 - 发布页承担基础输入校验和提交态控制，后端继续作为最终校验边界
 
-## 7. 目录选择说明
+### 集成测试实现
+
+- 后端涉及 MySQL / Redis 的测试统一通过 Testcontainers 启动容器
+- Liquibase baseline 在集成测试启动阶段自动执行
+
+## 7. 数据库迁移策略
+
+- 当前已收敛为单份 Liquibase baseline：`db/changelog/v1.0/000-baseline.sql`
+- 新库初始化直接执行 baseline，避免长期维护一串仅用于历史演进的初始化 SQL
+- 后续新增结构变更时，在 baseline 之后继续追加新的增量脚本
+
+## 8. 目录选择说明
 
 当前仓库已有 `wechat-mini-app/` 目录，因此本次实现默认使用该目录作为小程序客户端目录，暂不额外创建 `miniprogram/`，避免重复维护。
