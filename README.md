@@ -26,8 +26,9 @@ smart-life/
 ├── app-web/            # 用户侧 REST API 模块
 ├── app-backend/        # 管理侧后端模块
 ├── app-starter/        # 应用启动装配模块
-├── wechat-mini-app/        # 微信小程序目录
-├── wechat-mini-app/    # 预留或待清理的小程序相关目录
+├── wechat-mini-app/    # 微信小程序目录
+├── compose.yaml        # 本地 MySQL / Redis 编排
+├── .env.example        # 本地环境变量模板
 ├── docs/               # 正式文档体系
 ├── requirement/        # 历史需求材料
 ├── init-admin.sql      # 初始化管理员数据
@@ -62,95 +63,88 @@ smart-life/
 - Redis 6.0+
 - 微信开发者工具（用于小程序开发）
 
-### 1. 数据库配置
+### 1. 启动本地依赖
 
-1. 创建MySQL数据库：
-```sql
-CREATE DATABASE smart_life CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
+推荐直接使用 Docker：
 
-2. 修改配置文件中的数据库连接信息：
-```yaml
-# app-core/src/main/resources/application-core.yml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/smart_life?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: your_username
-    password: your_password
-```
-
-3. 执行初始化SQL脚本：
 ```bash
-mysql -u your_username -p smart_life < init-admin.sql
+cp .env.example .env
+docker compose up -d
 ```
 
-### 2. Redis配置
+会启动：
 
-确保Redis服务正在运行，默认配置：
-- 主机：localhost
-- 端口：6379
-- 无密码
+- MySQL 8
+- Redis 7
 
-### 3. 启动后端服务
+说明：
 
-1. 克隆项目到本地
-2. 进入项目根目录
-3. 编译项目：
+- 数据库结构会在应用启动时由 Liquibase 自动创建
+- 默认数据库账号见 `.env.example`
+
+### 2. 启动后端服务
+
 ```bash
-mvn clean compile
+DB_USERNAME=root DB_PASSWORD=root MYSQL_DATABASE=smart_life \
+mvn -pl app-starter -am clean spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-4. 运行项目：
-```bash
-cd app-web
-mvn spring-boot:run
-```
+说明：
 
-或者直接运行主类：`com.yxtech.smartlife.SmartLifeApplication`
+- 如果刚调整过 Liquibase 迁移文件，建议保留 `clean`，避免旧的 `target/classes` 资源残留影响启动结果
+- Spring Boot 启动过程中会先执行 Liquibase，再初始化依赖数据库表的启动 Bean
+- 2026-03-12 已使用 `127.0.0.1:3306 / smart_life / root / root` 完成一次真实启动验证
+- 2026-03-12 已完成 Redis 持久会话真实验证：管理员登录后 token 写入 Redis，Java 服务重启后同一 token 仍可访问管理接口，退出登录后 token 立即失效
 
-### 4. 启动微信小程序
+### 3. 启动微信小程序
 
 1. 打开微信开发者工具
 2. 导入项目，选择 `wechat-mini-app` 目录
-3. 修改 `wechat-mini-app/app.js` 中的 `baseUrl` 为你的后端地址
+3. 如有需要，修改 `wechat-mini-app/utils/config.js` 中的 `baseUrl`
 4. 配置小程序的AppID（测试可使用测试号）
 5. 点击编译运行
 
-### 5. 启动管理后台
+### 4. 演示账号与审核入口
 
-1. 直接在浏览器中打开 `admin-web/index.html`
-2. 或者通过Web服务器访问（推荐）：
-```bash
-# 使用Python简单服务器
-cd admin-web
-python -m http.server 8081
-# 访问 http://localhost:8081
-```
+小程序当前支持“访客默认进入 + 模拟登录”的联调方式：
 
-3. 使用默认管理员账号登录：
-   - 用户名：`admin`
-   - 密码：`admin123`
+- 访客：无需登录即可浏览已审核通过的信息
+- 审核员示例 code：`wx-reviewer-10001`、`wx-reviewer-10002`
+- 普通用户示例 code：`wx-user-10003`、`wx-user-10004`
+
+审核能力集成在小程序个人中心的“后台审核”入口中，只有指定审核员用户会显示该入口。
+
+后台审核接口默认管理员账号：
+
+- 用户名：`admin`
+- 密码：`admin123`
 
 ### 访问地址
 
 - **后端API**：http://localhost:8080
 - **API文档**：http://localhost:8080/swagger-ui.html
 - **健康检查**：http://localhost:8080/api/health
-- **管理后台**：http://localhost:8081（如使用Web服务器）
 - **微信小程序**：在微信开发者工具中运行
 
 ## 功能特性
 
 ### 小程序功能
-- **自动登录**：用户进入小程序自动注册/登录
+- **访客浏览**：用户进入小程序默认以访客身份浏览公开信息
+- **模拟登录**：通过 code 完成演示账号登录
 - **房屋出租**：发布房屋出租信息，支持图片上传
 - **车位出租**：发布车位出租信息，支持图片上传
-- **信息浏览**：查看所有可租房屋和车位信息
+- **闲置物品发布**：支持发布闲置物品信息
+- **个人中心**：提供“我要发布”、状态查看和账号切换
+- **信息浏览**：查看所有审核通过的房屋、车位和闲置物品
+- **详情页**：查看完整描述、图片和联系方式
 - **联系功能**：一键拨打房东/车主电话
 - **审核状态**：显示发布信息的审核状态
 
-### 管理后台功能
+### 管理侧功能
+- **审核入口控制**：仅指定审核员用户在个人中心看到“后台审核”
 - **管理员登录**：安全的管理员认证
+- **Redis 会话**：管理员令牌持久化在 Redis，并带过期时间
+- **重启续会**：Java 服务重启后，未过期管理员会话仍然有效
 - **信息审核**：审核用户发布的租赁信息
 - **强制下架**：管理员可强制下架任何信息
 - **状态管理**：查看所有信息的状态和详情
@@ -167,17 +161,21 @@ python -m http.server 8081
 
 ### 微信小程序接口
 - `POST /api/wechat/login` - 微信小程序登录
+- `POST /api/files/images` - 上传图片
 
 ### 租赁信息接口
 - `POST /api/rentals` - 发布租赁信息
 - `GET /api/rentals` - 获取所有可租信息
-- `GET /api/rentals/type/{type}` - 根据类型获取（HOUSE/PARKING）
+- `GET /api/rentals/{id}` - 获取公开详情
+- `GET /api/rentals/type/{type}` - 根据类型获取（HOUSE/PARKING/ITEM）
 - `GET /api/rentals/user/{userId}` - 获取用户发布的信息
+- `GET /api/rentals/user/{userId}/{id}` - 获取我的发布详情
 
-### 管理后台接口
+### 管理侧接口
 - `POST /api/admin/login` - 管理员登录
 - `GET /api/admin/rentals/pending` - 获取待审核信息
 - `GET /api/admin/rentals` - 获取所有信息
+- `GET /api/admin/rentals/{id}` - 获取管理侧详情
 - `POST /api/admin/rentals/{id}/review` - 审核信息
 - `POST /api/admin/rentals/{id}/offline` - 强制下架
 
@@ -189,30 +187,31 @@ python -m http.server 8081
 - 支持微信小程序自动注册
 
 ### 租赁信息表 (rental_info)
-- 统一的房屋和车位租赁信息表
-- 通过 `rental_type` 字段区分类型（HOUSE/PARKING）
+- 统一的房屋、车位和闲置物品信息表
+- 通过 `rental_type` 字段区分类型（HOUSE/PARKING/ITEM）
 - 包含审核状态和审核相关字段
 - 支持图片和视频存储（JSON格式）
 
 ### 管理员表 (admins)
 - 管理员账号信息
-- 用于管理后台登录和权限控制
+- 用于管理侧登录和权限控制
 
 ## 审核流程
 
-1. **用户发布**：用户在小程序中发布租赁信息，状态为 `PENDING`（待审核）
-2. **管理员审核**：管理员在后台查看待审核信息
-3. **审核结果**：
+1. **访客浏览**：未登录用户默认浏览 `APPROVED` 信息
+2. **用户发布**：用户在个人中心点击“我要发布”，提交后状态为 `PENDING`
+3. **管理员审核**：审核员用户进入后台审核页查看待审核信息
+4. **审核结果**：
    - 通过：状态变为 `APPROVED`，信息在小程序中显示
    - 拒绝：状态变为 `REJECTED`，可填写拒绝原因
-4. **强制下架**：管理员可随时将信息状态改为 `OFFLINE`
+5. **强制下架**：管理员可随时将信息状态改为 `OFFLINE`
 
 ## 开发指南
 
 ### 后端开发
 1. 实体类继承 `BaseEntity` 获得基础字段
 2. 使用JPA注解进行数据库映射
-3. dao接口继承 `Jpadao`
+3. Repository接口继承 `JpaRepository`
 4. 服务层使用 `@Service` 注解
 5. 控制器使用 `@RestController` 和Swagger注解
 
@@ -220,12 +219,13 @@ python -m http.server 8081
 1. 页面文件包含 `.wxml`、`.js`、`.wxss`、`.json`
 2. 使用 `wx.request` 调用后端API
 3. 通过 `app.js` 管理全局状态和用户信息
-4. 使用微信官方组件和API
+4. 通过 `reviewerUserIds` 控制审核入口展示
+5. 使用微信官方组件和API
 
-### 管理后台开发
-1. 使用原生HTML/CSS/JavaScript
-2. 通过 `fetch` API调用后端接口
-3. 简单的单页面应用架构
+### 管理审核能力开发
+1. 当前管理审核能力集成在微信小程序中
+2. 通过管理员接口和 `X-Admin-Token` 调用后端能力
+3. 如后续拆分独立前端，再补独立开发规范
 
 ## 配置说明
 
@@ -238,12 +238,21 @@ python -m http.server 8081
 - `REDIS_PORT` - Redis端口
 - `REDIS_PASSWORD` - Redis密码
 
+管理员会话：
+- 管理员令牌默认使用 Redis 持久化存储
+- 默认 TTL 为 120 分钟，本地 profile 为 240 分钟
+- 每次访问管理接口会刷新过期时间
+
+本地文件上传：
+- 上传目录默认是仓库根目录下的 `uploads/`
+- 访问路径默认映射为 `http://localhost:8080/uploads/{fileName}`
+
 ### 微信小程序配置
 
 1. 在微信公众平台注册小程序账号
 2. 获取小程序的AppID和AppSecret
 3. 配置服务器域名（后端API地址）
-4. 在 `wechat-mini-app/app.js` 中修改 `baseUrl`
+4. 在 `wechat-mini-app/utils/config.js` 中修改 `baseUrl`
 
 ### 日志配置
 
@@ -252,16 +261,19 @@ python -m http.server 8081
 ## 常见问题
 
 ### Q: 小程序无法连接后端？
-A: 检查 `wechat-mini-app/app.js` 中的 `baseUrl` 是否正确，确保后端服务已启动
+A: 检查 `wechat-mini-app/utils/config.js` 中的 `baseUrl` 是否正确，确保后端服务已启动
 
-### Q: 管理后台登录失败？
-A: 确保已执行 `init-admin.sql` 脚本，默认账号为 admin/admin123
+### Q: 为什么普通用户看不到“后台审核”？
+A: 该入口只对 `wechat-mini-app/utils/config.js` 中配置的审核员用户 ID 展示，普通用户和访客不会显示
 
 ### Q: 发布的信息不显示？
-A: 新发布的信息需要管理员审核通过后才会在小程序中显示
+A: 新发布的信息需要管理员审核通过后才会在小程序中显示；访客和普通用户公开列表只看到 `APPROVED` 数据
+
+### Q: 管理后台登录失败？
+A: 默认管理员会在应用首次启动时自动初始化，确认后端已成功启动且数据库迁移已完成，默认账号为 `admin/admin123`
 
 ### Q: 图片上传失败？
-A: 当前版本使用模拟图片URL，生产环境需要集成真实的图片上传服务
+A: 确认后端已启动且 `POST /api/files/images` 可用，同时检查 `uploads/` 目录是否可写；当前版本已支持本地图片上传
 
 ## 部署
 
@@ -269,16 +281,16 @@ A: 当前版本使用模拟图片URL，生产环境需要集成真实的图片�
 
 1. **后端部署**：
    - 打包：`mvn clean package`
-   - 运行：`java -jar app-web/target/app-web-1.0.0.jar --spring.profiles.active=prod`
+   - 运行：`java -jar app-starter/target/app-starter-1.0.0.jar --spring.profiles.active=prod`
 
 2. **小程序部署**：
    - 在微信开发者工具中点击"上传"
    - 在微信公众平台提交审核
    - 审核通过后发布
 
-3. **管理后台部署**：
-   - 将 `admin-web` 目录部署到Web服务器
-   - 配置Nginx或Apache代理
+3. **管理审核能力**：
+   - 当前管理审核能力集成在微信小程序中
+   - 如后续拆分独立前端，再补独立部署说明
 
 ## 技术支持
 

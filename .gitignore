@@ -67,6 +67,7 @@ application-prod.yml
 *.tmp
 *.temp
 *~
+uploads/
 
 # Node modules (if using frontend)
 node_modules/
