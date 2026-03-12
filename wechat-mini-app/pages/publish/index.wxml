@@ -1,0 +1,63 @@
+<view class="page">
+  <view class="hero-card">
+    <view class="hero-kicker">SMART LIFE</view>
+    <view class="hero-title">发布信息</view>
+    <view class="hero-copy">可发布房屋、车位或闲置物品。提交后会进入审核流程，审核通过后才会在生活广场展示。</view>
+  </view>
+
+  <view class="card">
+    <view class="field">
+      <text class="label">类型</text>
+      <picker class="picker" mode="selector" range="{{typeOptions}}" range-key="label" bindchange="onTypeChange">
+        <view class="picker">{{typeOptions[typeIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">标题</text>
+      <input class="input" placeholder="例如：地铁口两居室整租 / 地下固定车位转租" maxlength="40" bindinput="bindField" data-field="title" value="{{form.title}}" />
+    </view>
+    <view class="field">
+      <text class="label">描述</text>
+      <textarea class="textarea" placeholder="补充房屋配置、停车位置、物品成色、交易方式等关键信息" maxlength="300" bindinput="bindField" data-field="description" value="{{form.description}}" />
+    </view>
+    <view class="field">
+      <text class="label">价格</text>
+      <input class="input" type="digit" placeholder="请输入金额，例如 1500" bindinput="bindField" data-field="price" value="{{form.price}}" />
+    </view>
+    <view class="field">
+      <text class="label">联系人</text>
+      <input class="input" placeholder="请输入联系人姓名" maxlength="20" bindinput="bindField" data-field="contactName" value="{{form.contactName}}" />
+    </view>
+    <view class="field">
+      <text class="label">联系电话</text>
+      <input class="input" type="number" placeholder="请输入手机号或常用联系电话" maxlength="20" bindinput="bindField" data-field="contactPhone" value="{{form.contactPhone}}" />
+    </view>
+    <view class="field">
+      <text class="label">区域 / 小区</text>
+      <input class="input" placeholder="例如：阳光花园 3 栋 / 地铁口附近" maxlength="40" bindinput="bindField" data-field="communityName" value="{{form.communityName}}" />
+    </view>
+    <view class="field">
+      <text class="label">图片</text>
+      <button class="button button-secondary" loading="{{uploading}}" bindtap="chooseImages">
+        {{uploading ? '上传中...' : '选择并上传图片'}}
+      </button>
+      <view class="meta helper-text">建议上传实拍图，最多 6 张。</view>
+      <view class="image-grid" wx:if="{{form.imageUrls.length}}">
+        <block wx:for="{{form.imageUrls}}" wx:key="*this">
+          <view class="image-item">
+            <image class="preview-image" src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
+            <view class="remove-tag" data-index="{{index}}" bindtap="removeImage">删除</view>
+          </view>
+        </block>
+      </view>
+    </view>
+    <button class="button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">{{submitting ? '提交中...' : '提交审核'}}</button>
+  </view>
+
+  <view class="note-card">
+    <view class="section-title">发布提示</view>
+    <view class="meta">1. 标题和描述尽量写清楚，审核会更快。</view>
+    <view class="meta">2. 联系方式默认仅在详情页中展示。</view>
+    <view class="meta">3. 审核通过后，信息才会出现在生活广场。</view>
+  </view>
+</view>

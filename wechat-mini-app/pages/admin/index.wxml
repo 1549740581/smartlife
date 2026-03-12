@@ -1,0 +1,53 @@
+<view class="page">
+  <view class="card" wx:if="{{!adminToken}}">
+    <view class="title">审核台登录</view>
+    <view class="meta">只有个人中心展示“后台审核”的指定账号才应进入本页。</view>
+    <view class="field">
+      <text class="label">用户名</text>
+      <input class="input" value="{{username}}" bindinput="onUsernameInput" />
+    </view>
+    <view class="field">
+      <text class="label">密码</text>
+      <input class="input" password value="{{password}}" bindinput="onPasswordInput" />
+    </view>
+    <button class="button" bindtap="login">登录</button>
+  </view>
+
+  <view wx:else>
+    <view class="hero-card">
+      <view class="hero-top">
+        <view>
+          <view class="hero-kicker">SMART LIFE</view>
+          <view class="hero-title">审核工作台</view>
+        </view>
+        <view class="identity-badge">{{pendingRentals.length}} 条待处理</view>
+      </view>
+      <view class="hero-copy">会话有效期至：{{expiresAt || '-'}}</view>
+      <view class="demo-action-row">
+        <button class="button button-secondary demo-button" bindtap="loadPending">刷新列表</button>
+        <button class="button button-secondary demo-button" bindtap="logout">退出登录</button>
+      </view>
+    </view>
+
+    <view class="empty-card" wx:if="{{!pendingRentals.length}}">
+      <view class="empty-title">当前没有待审核信息</view>
+      <view class="meta">公开广场只会展示审核通过的内容。</view>
+    </view>
+
+    <block wx:for="{{pendingRentals}}" wx:key="id">
+      <view class="record-card">
+        <view class="record-top">
+          <view class="record-title">{{item.title}}</view>
+          <view class="listing-tag">{{item.typeLabel}}</view>
+        </view>
+        <view class="record-desc">{{item.description}}</view>
+        <view class="record-meta">{{item.priceText}} · 联系人：{{item.contactName}} {{item.contactPhone}}</view>
+        <view class="admin-actions">
+          <button class="button button-secondary admin-button" data-id="{{item.id}}" bindtap="goDetail">查看详情</button>
+          <button class="button admin-button" data-id="{{item.id}}" data-approved="true" bindtap="review">审核通过</button>
+          <button class="button button-secondary admin-button" data-id="{{item.id}}" data-approved="false" bindtap="review">审核拒绝</button>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

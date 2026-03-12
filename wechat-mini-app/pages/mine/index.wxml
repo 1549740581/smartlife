@@ -1,0 +1,49 @@
+<view class="page">
+  <view class="profile-card">
+    <view class="profile-top">
+      <view class="profile-avatar">{{avatarText}}</view>
+      <view class="profile-main">
+        <view class="profile-name">{{user.nickname || '访客'}}</view>
+        <view class="profile-meta">角色：{{roleLabel}}</view>
+        <view class="profile-meta">用户 ID：{{user.userId || '-'}}</view>
+      </view>
+      <view class="profile-role">{{roleLabel}}</view>
+    </view>
+    <view class="action-grid">
+      <button class="button action-button" bindtap="goPublish">我要发布</button>
+      <button class="button button-secondary action-button" wx:if="{{isGuest}}" bindtap="goLogin">去登录</button>
+      <button class="button button-secondary action-button" wx:if="{{!isGuest}}" bindtap="switchAccount">切换账号</button>
+      <button class="button button-secondary action-button" wx:if="{{canReview}}" bindtap="goAdmin">后台审核</button>
+    </view>
+  </view>
+
+  <view class="note-card" wx:if="{{isGuest}}">
+    <view class="section-title">访客说明</view>
+    <view class="meta">访客可以浏览公开信息，登录后即可发布房屋、车位或闲置物品。</view>
+  </view>
+
+  <view class="section-head" wx:if="{{!isGuest}}">
+    <view class="section-title">我的发布</view>
+    <view class="section-meta">{{rentals.length}} 条记录</view>
+  </view>
+
+  <view class="empty-card" wx:if="{{!isGuest && !rentals.length}}">
+    <view class="empty-title">还没有发布记录</view>
+    <view class="meta">点击“我要发布”即可提交房屋、车位或闲置物品信息。</view>
+  </view>
+
+  <block wx:if="{{!isGuest}}">
+    <block wx:for="{{rentals}}" wx:key="id">
+      <view class="record-card" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="record-top">
+          <view class="record-title">{{item.title}}</view>
+          <view class="status status-{{item.statusClass}}">{{item.statusLabel}}</view>
+        </view>
+        <view class="record-desc">{{item.description}}</view>
+        <view class="record-meta">{{item.typeLabel}} · {{item.priceText}}</view>
+        <view class="record-meta">联系人：{{item.contactName}} {{item.contactPhone}}</view>
+        <view class="record-reason" wx:if="{{item.rejectReason}}">驳回原因：{{item.rejectReason}}</view>
+      </view>
+    </block>
+  </block>
+</view>

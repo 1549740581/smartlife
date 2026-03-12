@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/login/index",
+    "pages/publish/index",
+    "pages/mine/index",
+    "pages/admin/index",
+    "pages/rental-detail/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Smart Life",
+    "navigationBarBackgroundColor": "#1f6feb",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f7fb"
+  },
+  "tabBar": {
+    "color": "#76839b",
+    "selectedColor": "#1f6feb",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "生活广场",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "个人中心",
+        "iconPath": "assets/tabbar/mine.png",
+        "selectedIconPath": "assets/tabbar/mine-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

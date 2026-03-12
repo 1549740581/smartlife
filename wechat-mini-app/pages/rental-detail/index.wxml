@@ -1,0 +1,63 @@
+<view class="page" wx:if="{{rental}}">
+  <view class="hero-card">
+    <view class="hero-top">
+      <view class="hero-main">
+        <view class="hero-kicker">SMART LIFE</view>
+        <view class="hero-title">{{rental.title}}</view>
+      </view>
+      <view class="status status-{{rental.statusClass}} hero-status">{{rental.statusText}}</view>
+    </view>
+    <view class="hero-copy">{{rental.description}}</view>
+    <view class="detail-badges">
+      <view class="detail-badge">{{rental.typeLabel}}</view>
+      <view class="detail-badge">{{rental.priceText}}</view>
+      <view class="detail-badge">{{rental.communityName || '未填写小区'}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">联系方式</view>
+    <view class="contact-panel">
+      <view class="contact-row">
+        <view class="contact-label">联系人</view>
+        <view class="contact-value">{{rental.contactName}}</view>
+      </view>
+      <view class="contact-row">
+        <view class="contact-label">联系电话</view>
+        <view class="contact-value">{{rental.contactPhone}}</view>
+      </view>
+    </view>
+    <button class="button" bindtap="callContact">拨打电话</button>
+  </view>
+
+  <view class="card" wx:if="{{rental.imageUrls && rental.imageUrls.length}}">
+    <view class="section-title">图片</view>
+    <scroll-view class="image-list" scroll-x="true" enhanced="true" show-scrollbar="false">
+      <block wx:for="{{rental.imageUrls}}" wx:key="*this">
+        <image class="preview-image" src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
+      </block>
+    </scroll-view>
+  </view>
+
+  <view class="note-card" wx:if="{{rental.rejectReason}}">
+    <view class="section-title">处理说明</view>
+    <view class="record-reason">{{rental.rejectReason}}</view>
+  </view>
+
+  <view class="card" wx:if="{{source === 'admin' && rental.status === 'PENDING'}}">
+    <view class="section-title">审核操作</view>
+    <button class="button" data-approved="true" bindtap="review">审核通过</button>
+    <button class="button button-secondary" data-approved="false" bindtap="review">审核拒绝</button>
+  </view>
+
+  <view class="card" wx:if="{{source === 'admin' && rental.status === 'APPROVED'}}">
+    <view class="section-title">管理操作</view>
+    <button class="button button-secondary" bindtap="offline">强制下架</button>
+  </view>
+</view>
+
+<view class="page" wx:elif="{{loading}}">
+  <view class="empty-card">
+    <view class="empty-title">加载中...</view>
+  </view>
+</view>

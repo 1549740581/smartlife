@@ -1,0 +1,41 @@
+.button {
+  margin-top: 24rpx;
+}
+
+.card {
+  padding-top: 24rpx;
+}
+
+.helper-text {
+  margin-top: 12rpx;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+  gap: 16rpx;
+}
+
+.image-item {
+  position: relative;
+}
+
+.preview-image {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 24rpx;
+  background: #e5e7eb;
+  box-shadow: 0 10rpx 22rpx rgba(21, 37, 63, 0.12);
+}
+
+.remove-tag {
+  position: absolute;
+  right: 8rpx;
+  bottom: 8rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(17, 24, 39, 0.75);
+  color: #ffffff;
+  font-size: 20rpx;
+}
