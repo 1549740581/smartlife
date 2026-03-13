@@ -96,6 +96,12 @@ page {
   box-shadow: none;
 }
 
+.button-warn {
+  background: #fef3c7;
+  color: #b45309;
+  box-shadow: none;
+}
+
 .pill-group {
   display: flex;
   flex-wrap: wrap;

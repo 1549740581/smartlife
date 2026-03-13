@@ -96,5 +96,8 @@ Page({
   },
   goAdmin() {
     wx.navigateTo({ url: '/pages/admin/index' });
+  },
+  goMyComplaints() {
+    wx.navigateTo({ url: '/pages/my-complaints/index' });
   }
 });

@@ -73,6 +73,10 @@
 - RentalInfo
 - ReviewRecord
 - AddressOption
+- RentalConversation
+- RentalMessage
+- RentalOrder
+- Complaint
 
 ## 5. 关键流程
 

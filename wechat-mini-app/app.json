@@ -1,13 +1,16 @@
 {
   "pages": [
     "pages/home/index",
+    "pages/messages/index",
     "pages/login/index",
     "pages/publish/index",
     "pages/mine/index",
     "pages/admin/index",
     "pages/rental-detail/index",
     "pages/conversation-list/index",
-    "pages/conversation-detail/index"
+    "pages/conversation-detail/index",
+    "pages/complaint/index",
+    "pages/my-complaints/index"
   ],
   "window": {
     "navigationBarTitleText": "Smart Life",
@@ -26,6 +29,12 @@
         "text": "生活广场",
         "iconPath": "assets/tabbar/home.png",
         "selectedIconPath": "assets/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/messages/index",
+        "text": "消息",
+        "iconPath": "assets/tabbar/message.png",
+        "selectedIconPath": "assets/tabbar/message-active.png"
       },
       {
         "pagePath": "pages/mine/index",

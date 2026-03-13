@@ -198,5 +198,23 @@ Page({
     wx.navigateTo({
       url: `/pages/conversation-list/index?rentalId=${rental.id}&title=${encodeURIComponent(rental.title)}`
     });
+  },
+  reportComplaint() {
+    const rental = this.data.rental;
+    const currentUser = getApp().getCurrentUser();
+    if (!currentUser || !currentUser.userId) {
+      wx.navigateTo({ url: '/pages/login/index' });
+      return;
+    }
+    if (!rental) {
+      return;
+    }
+    if (Number(rental.publisherUserId) === Number(currentUser.userId)) {
+      wx.showToast({ title: '不能投诉自己的信息', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({
+      url: `/pages/complaint/index?rentalId=${rental.id}`
+    });
   }
 });

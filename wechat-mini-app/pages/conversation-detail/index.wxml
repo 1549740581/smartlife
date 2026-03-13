@@ -1,0 +1,103 @@
+<view class="page" wx:if="{{detail}}">
+  <view class="hero-card">
+    <view class="hero-top">
+      <view>
+        <view class="hero-kicker">SMART LIFE</view>
+        <view class="hero-title">{{detail.rental.title}}</view>
+      </view>
+      <view class="identity-badge">{{detail.currentUserRole === 'LANDLORD' ? '房东' : '租客'}}</view>
+    </view>
+    <view class="hero-copy">沟通对象：{{detail.counterpartNickname || ('用户' + detail.counterpartUserId)}} · {{detail.rental.statusText}}</view>
+    <view class="detail-badges">
+      <view class="detail-badge">{{detail.rental.typeLabel}}</view>
+      <view class="detail-badge">{{detail.rental.priceText}}</view>
+      <view class="detail-badge">{{detail.rental.locationText || '杭州 / 未填写'}}</view>
+    </view>
+  </view>
+
+  <view class="note-card" wx:if="{{detail.rental.status === 'RENTED' && detail.rental.rentStartDate && detail.rental.rentEndDate}}">
+    <view class="section-title">当前出租周期</view>
+    <view class="meta">{{detail.rental.rentStartDate}} 至 {{detail.rental.rentEndDate}}</view>
+  </view>
+
+  <view class="card" wx:if="{{detail.rental.rentalType !== 'ITEM' && (detail.currentUserRole === 'TENANT' || renewBaseOrderId)}}">
+    <view class="section-title">{{renewBaseOrderId ? '续约申请' : '发送租期卡片'}}</view>
+    <view class="field">
+      <text class="label">开始日期</text>
+      <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+        <view class="picker-value">{{startDate}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">结束日期</text>
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+        <view class="picker-value">{{endDate}}</view>
+      </picker>
+    </view>
+    <button class="button" loading="{{sendingOrder}}" disabled="{{sendingOrder}}" bindtap="sendOrderCard">
+      {{sendingOrder ? '发送中...' : (renewBaseOrderId ? '发送续约申请' : '发送租期卡片')}}
+    </button>
+    <button class="button button-secondary" wx:if="{{renewBaseOrderId}}" bindtap="clearOrderForm">取消续约</button>
+  </view>
+
+  <view class="card">
+    <view class="section-head">
+      <view class="section-title">订单记录</view>
+      <view class="section-meta">{{detail.orders.length}} 条</view>
+    </view>
+    <view class="empty-card order-empty" wx:if="{{!detail.orders.length}}">
+      <view class="meta">还没有租期卡片，先在下方沟通后再发起租赁申请。</view>
+    </view>
+    <block wx:for="{{detail.orders}}" wx:key="id">
+      <view class="order-card">
+        <view class="record-top">
+          <view class="record-title">{{item.periodText}}</view>
+          <view class="listing-tag">{{item.statusText}}</view>
+        </view>
+        <view class="record-meta">房东：{{item.landlordNickname || ('用户' + item.landlordUserId)}} · 租客：{{item.tenantNickname || ('用户' + item.tenantUserId)}}</view>
+        <view class="record-reason" wx:if="{{item.cancelReason}}">{{item.cancelReason}}</view>
+        <view class="order-actions">
+          <button class="button order-button" wx:if="{{item.canAccept}}" data-order-id="{{item.id}}" loading="{{handlingOrderId === item.id}}" disabled="{{handlingOrderId === item.id}}" bindtap="acceptOrder">房东同意</button>
+          <button class="button button-secondary order-button" wx:if="{{item.canRequestCancel}}" data-order-id="{{item.id}}" loading="{{handlingOrderId === item.id}}" disabled="{{handlingOrderId === item.id}}" bindtap="requestCancel">发起取消</button>
+          <button class="button order-button" wx:if="{{item.canConfirmCancel}}" data-order-id="{{item.id}}" loading="{{handlingOrderId === item.id}}" disabled="{{handlingOrderId === item.id}}" bindtap="confirmCancel">同意取消</button>
+          <button class="button button-secondary order-button" wx:if="{{item.canRenew}}" data-order-id="{{item.id}}" bindtap="useRenewOrder">续约</button>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="section-head">
+      <view class="section-title">沟通消息</view>
+      <view class="section-meta">{{detail.messages.length}} 条</view>
+    </view>
+    <view class="message-list">
+      <block wx:for="{{detail.messages}}" wx:key="id">
+        <view class="message-row {{item.isMine ? 'message-row-mine' : ''}} {{item.isSystem ? 'message-row-system' : ''}}">
+          <view class="message-meta">{{item.senderNickname}}</view>
+          <view class="message-bubble {{item.isMine ? 'message-bubble-mine' : ''}} {{item.isSystem ? 'message-bubble-system' : ''}}">
+            <view>{{item.content}}</view>
+            <view class="message-order" wx:if="{{item.order}}">
+              <view>订单状态：{{item.orderStatusText}}</view>
+              <view>租期：{{item.orderPeriodText}}</view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">发送文字消息</view>
+    <textarea class="textarea" maxlength="300" placeholder="先和房东确认细节，再发送租期卡片更稳妥" bindinput="onDraftInput" value="{{draftContent}}" />
+    <button class="button" loading="{{sendingMessage}}" disabled="{{sendingMessage}}" bindtap="sendMessage">
+      {{sendingMessage ? '发送中...' : '发送消息'}}
+    </button>
+  </view>
+</view>
+
+<view class="page" wx:elif="{{loading}}">
+  <view class="empty-card">
+    <view class="empty-title">加载中...</view>
+  </view>
+</view>

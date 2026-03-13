@@ -1,0 +1,36 @@
+<view class="page">
+  <view class="page-header">
+    <text class="page-title">消息</text>
+  </view>
+
+  <view class="conversation-list" wx:if="{{!loading && conversations.length > 0}}">
+    <view class="conversation-item" wx:for="{{conversations}}" wx:key="id" bindtap="goConversation" data-id="{{item.id}}" data-rental-id="{{item.rentalInfoId}}">
+      <view class="conversation-avatar">
+        <text class="avatar-text">{{item.counterpartNickname[0] || '?'}}</text>
+        <view class="unread-badge" wx:if="{{item.unreadCount > 0}}">{{item.unreadCount > 99 ? '99+' : item.unreadCount}}</view>
+      </view>
+      <view class="conversation-content">
+        <view class="conversation-header">
+          <text class="conversation-name">{{item.counterpartNickname}}</text>
+          <text class="conversation-time">{{item.lastMessageAtText}}</text>
+        </view>
+        <view class="conversation-preview">
+          <text class="preview-text">{{item.lastMessagePreview || '暂无消息'}}</text>
+        </view>
+        <view class="conversation-rental">
+          <text class="rental-title">{{item.rentalTitle}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{!loading && conversations.length === 0}}">
+    <text class="empty-icon">💬</text>
+    <text class="empty-text">暂无会话</text>
+    <text class="empty-hint">浏览房源并发起咨询后，会话将出现在这里</text>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

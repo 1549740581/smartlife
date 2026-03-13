@@ -39,8 +39,12 @@ public class User extends BaseEntity {
     @Column(name = "status", nullable = false, length = 32)
     private UserStatus status = UserStatus.ACTIVE;
 
+    @Column(name = "warning_count", nullable = false)
+    private Integer warningCount = 0;
+
     public enum UserStatus {
         ACTIVE,
-        INACTIVE
+        INACTIVE,
+        LOCKED
     }
 }

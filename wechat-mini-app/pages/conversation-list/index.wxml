@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="hero-card">
+    <view class="hero-top">
+      <view>
+        <view class="hero-kicker">SMART LIFE</view>
+        <view class="hero-title">{{pageTitle}}</view>
+      </view>
+      <view class="identity-badge">{{conversations.length}} 条会话</view>
+    </view>
+    <view class="hero-copy">这里会展示你作为房东或租客参与的全部租赁沟通。租期卡片、取消申请和系统提醒都会沉淀在会话里。</view>
+  </view>
+
+  <view class="empty-card" wx:if="{{!loading && !conversations.length}}">
+    <view class="empty-title">还没有租赁沟通</view>
+    <view class="meta">在公开详情页点击“我想租”，或者在自己发布的房源下查看沟通记录。</view>
+  </view>
+
+  <block wx:for="{{conversations}}" wx:key="id">
+    <view class="record-card" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="record-top">
+        <view class="record-title">{{item.rentalTitle}}</view>
+        <view class="listing-tag">{{item.roleLabel}}</view>
+      </view>
+      <view class="record-meta">沟通对象：{{item.counterpartLabel}}</view>
+      <view class="record-meta">{{item.locationText || '杭州 / 暂无地址'}}</view>
+      <view class="record-desc">{{item.lastMessagePreview}}</view>
+      <view class="record-meta" wx:if="{{item.orderStatusText}}">最新订单：{{item.orderStatusText}} · {{item.orderDateText}}</view>
+      <view class="record-meta" wx:if="{{item.rentRangeText}}">当前出租：{{item.rentRangeText}}</view>
+    </view>
+  </block>
+</view>

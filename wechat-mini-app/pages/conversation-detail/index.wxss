@@ -1,0 +1,59 @@
+.order-card {
+  padding: 24rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  border: 1rpx solid rgba(31, 111, 235, 0.08);
+  margin-top: 18rpx;
+}
+
+.order-empty {
+  margin-top: 18rpx;
+}
+
+.order-actions {
+  margin-top: 18rpx;
+}
+
+.order-button {
+  margin-top: 12rpx;
+}
+
+.message-list {
+  margin-top: 12rpx;
+}
+
+.message-row {
+  margin-top: 18rpx;
+}
+
+.message-meta {
+  font-size: 22rpx;
+  color: #6a778b;
+  margin-bottom: 8rpx;
+}
+
+.message-bubble {
+  max-width: 100%;
+  padding: 20rpx;
+  border-radius: 24rpx;
+  background: #f5f8fd;
+  color: #1f2a3a;
+  line-height: 1.7;
+}
+
+.message-bubble-mine {
+  background: #e8f2ff;
+  color: #12438f;
+}
+
+.message-bubble-system {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.message-order {
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid rgba(118, 131, 155, 0.18);
+  font-size: 24rpx;
+}

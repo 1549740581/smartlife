@@ -38,6 +38,13 @@
       {{openingConversation ? '进入沟通中...' : '我想租'}}
     </button>
     <button
+      class="button button-warn"
+      wx:if="{{source === 'public'}}"
+      bindtap="reportComplaint"
+    >
+      投诉举报
+    </button>
+    <button
       class="button button-secondary"
       wx:if="{{source === 'mine' && rental.rentalType !== 'ITEM'}}"
       bindtap="goConversationList"

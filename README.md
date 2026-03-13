@@ -222,6 +222,12 @@ mvn -pl app-starter -am clean spring-boot:run -Dspring-boot.run.profiles=local
 - `POST /api/rental-orders/{id}/cancel/request`
 - `POST /api/rental-orders/{id}/cancel/confirm`
 - `POST /api/rental-orders/{id}/renew`
+- `POST /api/complaints`
+- `POST /api/complaints/user`
+- `POST /api/complaints/detail`
+- `POST /api/messages/unread-count`
+- `POST /api/rental-conversations/list`
+- `POST /api/rental-conversations/mark-read`
 
 ### 管理侧
 
@@ -232,6 +238,11 @@ mvn -pl app-starter -am clean spring-boot:run -Dspring-boot.run.profiles=local
 - `POST /api/admin/rentals/{id}/offline`
 - `GET /api/admin/orders`
 - `POST /api/admin/orders/{id}/cancel`
+- `POST /api/admin/complaints/pending`
+- `POST /api/admin/complaints/list`
+- `POST /api/admin/complaints/detail`
+- `POST /api/admin/complaints/process`
+- `POST /api/admin/complaints/unlock`
 
 ## 配置说明
 

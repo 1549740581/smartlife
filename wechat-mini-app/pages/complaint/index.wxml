@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="hero-card">
+    <view class="hero-kicker">投诉举报</view>
+    <view class="hero-title">{{rental.title}}</view>
+    <view class="hero-copy">请填写投诉信息，我们会尽快处理</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">投诉理由 <text class="required">*</text></view>
+    <textarea
+      class="textarea"
+      placeholder="请详细描述您的投诉理由"
+      maxlength="500"
+      bindinput="onReasonInput"
+      value="{{reason}}"
+    />
+    <view class="char-count">{{reason.length}}/500</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">证据上传（可选）</view>
+    <view class="upload-tip">支持图片和视频，最多9个文件</view>
+    <view class="upload-list">
+      <block wx:for="{{evidenceFiles}}" wx:key="index">
+        <view class="upload-item">
+          <image wx:if="{{item.type === 'image'}}" class="upload-preview" src="{{item.url}}" mode="aspectFill" />
+          <view wx:else class="upload-preview video-placeholder">
+            <text class="video-icon">▶</text>
+          </view>
+          <view class="upload-remove" data-index="{{index}}" bindtap="removeFile">×</view>
+        </view>
+      </block>
+      <view class="upload-item upload-add" wx:if="{{evidenceFiles.length < 9}}" bindtap="chooseFile">
+        <text class="upload-icon">+</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <button class="button" loading="{{submitting}}" disabled="{{submitting || !reason.trim()}}" bindtap="submit">
+      {{submitting ? '提交中...' : '提交投诉'}}
+    </button>
+    <button class="button button-secondary" bindtap="cancel">取消</button>
+  </view>
+</view>
