@@ -25,6 +25,12 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Override
     @Transactional
     public void addFavorite(Long userId, Long rentalInfoId) {
+        // 检查是否为自己发布的信息
+        RentalInfo rental = rentalInfoRepository.findByIdAndDeletedFalse(rentalInfoId)
+                .orElseThrow(() -> new IllegalArgumentException("rental not found"));
+        if (rental.getPublisherUserId().equals(userId)) {
+            throw new IllegalArgumentException("cannot favorite your own rental");
+        }
         if (favoriteRepository.existsByUserIdAndRentalInfoId(userId, rentalInfoId)) {
             return;
         }

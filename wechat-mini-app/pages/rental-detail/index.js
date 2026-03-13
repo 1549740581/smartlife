@@ -36,7 +36,8 @@ Page({
     loading: false,
     openingConversation: false,
     isFavorite: false,
-    favoriteLoading: false
+    favoriteLoading: false,
+    isOwner: false
   },
   onLoad(options) {
     this.setData({
@@ -55,6 +56,8 @@ Page({
     this.setData({ loading: true });
     try {
       const rental = await this.fetchDetail();
+      const currentUser = getApp().getCurrentUser();
+      const isOwner = currentUser && currentUser.userId && rental.publisherUserId === currentUser.userId;
       this.setData({
         rental: {
           ...rental,
@@ -63,7 +66,8 @@ Page({
           typeLabel: TYPE_LABELS[rental.rentalType] || rental.rentalType,
           priceText: rental.price ? `¥${rental.price}` : '价格面议',
           locationText: [rental.city, rental.district, rental.street, rental.communityName].filter(Boolean).join(' / ')
-        }
+        },
+        isOwner
       });
     } catch (err) {
       clearAdminSessionIfUnauthorized(err);

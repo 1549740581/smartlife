@@ -6,7 +6,7 @@
         <view class="hero-title">{{rental.title}}</view>
       </view>
       <view class="hero-actions">
-        <view class="favorite-btn {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite" wx:if="{{source === 'public'}}">
+        <view class="favorite-btn {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite" wx:if="{{source === 'public' && !isOwner}}">
           <text class="favorite-icon">{{isFavorite ? '★' : '☆'}}</text>
         </view>
         <view class="status status-{{rental.statusClass}} hero-status">{{rental.statusText}}</view>
