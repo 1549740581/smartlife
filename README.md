@@ -228,6 +228,11 @@ mvn -pl app-starter -am clean spring-boot:run -Dspring-boot.run.profiles=local
 - `POST /api/messages/unread-count`
 - `POST /api/rental-conversations/list`
 - `POST /api/rental-conversations/mark-read`
+- `POST /api/favorites/add`
+- `POST /api/favorites/remove`
+- `POST /api/favorites/check`
+- `POST /api/favorites/list`
+- `POST /api/favorites/filter-ids`
 
 ### 管理侧
 

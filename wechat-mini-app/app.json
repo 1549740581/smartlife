@@ -10,7 +10,8 @@
     "pages/conversation-list/index",
     "pages/conversation-detail/index",
     "pages/complaint/index",
-    "pages/my-complaints/index"
+    "pages/my-complaints/index",
+    "pages/favorites/index"
   ],
   "window": {
     "navigationBarTitleText": "Smart Life",

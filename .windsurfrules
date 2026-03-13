@@ -27,3 +27,24 @@
 * 其他回复  将用户输入作为下一轮指令继续执行
 
 **唯一豁免**：用户在本轮输入已明确表示结束  直接结束，不调用 `ask_user_question`
+
+<!-- PANEL_FEEDBACK_V5 -->
+
+# 🔄 交互循环
+每一轮回复结束前必须调用脚本，不得自行终止对话：
+
+```bash
+node "~/.panel-feedback/feedback.cjs" "状态描述..."
+```
+
+- **Blocking**: true
+- **SafeToAutoRun**: true
+- **处理**: 遇到指令立即执行；遇到图片路径用 read_file 查看。
+
+## 规则
+1. 强制在回复末尾调用脚本。
+2. 所有回复必须使用中文。
+3. 严禁使用省略号。
+
+trigger: always_on
+alwaysApply: true

@@ -34,7 +34,9 @@ Page({
     source: 'public',
     rental: null,
     loading: false,
-    openingConversation: false
+    openingConversation: false,
+    isFavorite: false,
+    favoriteLoading: false
   },
   onLoad(options) {
     this.setData({
@@ -44,6 +46,7 @@ Page({
   },
   onShow() {
     this.loadDetail();
+    this.checkFavorite();
   },
   async loadDetail() {
     if (!this.data.rentalId) {
@@ -216,5 +219,55 @@ Page({
     wx.navigateTo({
       url: `/pages/complaint/index?rentalId=${rental.id}`
     });
+  },
+  async checkFavorite() {
+    const currentUser = getApp().getCurrentUser();
+    if (!currentUser || !currentUser.userId || !this.data.rentalId) {
+      return;
+    }
+    try {
+      const isFavorite = await request({
+        url: '/api/favorites/check',
+        method: 'POST',
+        data: {
+          userId: currentUser.userId,
+          rentalInfoId: this.data.rentalId
+        }
+      });
+      this.setData({ isFavorite });
+    } catch (err) {
+      console.error('Check favorite failed:', err);
+    }
+  },
+  async toggleFavorite() {
+    const currentUser = getApp().getCurrentUser();
+    if (!currentUser || !currentUser.userId) {
+      wx.navigateTo({ url: '/pages/login/index' });
+      return;
+    }
+    if (this.data.favoriteLoading) {
+      return;
+    }
+    this.setData({ favoriteLoading: true });
+    try {
+      const url = this.data.isFavorite ? '/api/favorites/remove' : '/api/favorites/add';
+      await request({
+        url,
+        method: 'POST',
+        data: {
+          userId: currentUser.userId,
+          rentalInfoId: this.data.rentalId
+        }
+      });
+      this.setData({ isFavorite: !this.data.isFavorite });
+      wx.showToast({
+        title: this.data.isFavorite ? '已收藏' : '已取消收藏',
+        icon: 'success'
+      });
+    } catch (err) {
+      wx.showToast({ title: String(err), icon: 'none' });
+    } finally {
+      this.setData({ favoriteLoading: false });
+    }
   }
 });

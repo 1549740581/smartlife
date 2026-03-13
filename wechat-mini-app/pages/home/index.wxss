@@ -33,3 +33,20 @@
 .location-picker {
   color: #314155;
 }
+
+.listing-card {
+  position: relative;
+}
+
+.favorite-badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+  color: #fff;
+  font-size: 22rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+  z-index: 1;
+}

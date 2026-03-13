@@ -22,6 +22,7 @@ Page({
     activeType: 'ALL',
     keyword: '',
     rentals: [],
+    favoriteIds: [],
     roleLabel: '访客',
     currentUser: null,
     identityText: '访客',
@@ -98,9 +99,31 @@ Page({
         url: '/api/rentals',
         data: requestData
       });
-      this.setData({ rentals: formatRentals(rentals) });
+      const formattedRentals = formatRentals(rentals);
+      this.setData({ rentals: formattedRentals });
+      this.loadFavoriteStatus(formattedRentals.map(r => r.id));
     } catch (err) {
       wx.showToast({ title: String(err), icon: 'none' });
+    }
+  },
+  async loadFavoriteStatus(rentalIds) {
+    const currentUser = getApp().getCurrentUser();
+    if (!currentUser || !currentUser.userId || !rentalIds.length) {
+      this.setData({ favoriteIds: [] });
+      return;
+    }
+    try {
+      const favoriteIds = await request({
+        url: '/api/favorites/filter-ids',
+        method: 'POST',
+        data: {
+          userId: currentUser.userId,
+          rentalInfoIds: rentalIds
+        }
+      });
+      this.setData({ favoriteIds: favoriteIds || [] });
+    } catch (err) {
+      console.error('Load favorite status failed:', err);
     }
   },
   onKeywordInput(e) {

@@ -9,6 +9,35 @@
   flex: 1;
 }
 
+.hero-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.favorite-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favorite-btn.active {
+  background: rgba(255, 215, 0, 0.3);
+}
+
+.favorite-icon {
+  font-size: 36rpx;
+  color: #fff;
+}
+
+.favorite-btn.active .favorite-icon {
+  color: #ffd700;
+}
+
 .hero-status {
   margin-top: 0;
   margin-left: 20rpx;

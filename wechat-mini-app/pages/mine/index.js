@@ -99,5 +99,8 @@ Page({
   },
   goMyComplaints() {
     wx.navigateTo({ url: '/pages/my-complaints/index' });
+  },
+  goFavorites() {
+    wx.navigateTo({ url: '/pages/favorites/index' });
   }
 });

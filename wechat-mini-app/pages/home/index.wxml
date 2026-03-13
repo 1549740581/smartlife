@@ -54,6 +54,7 @@
 
   <block wx:for="{{rentals}}" wx:key="id">
     <view class="listing-card" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="favorite-badge" wx:if="{{favoriteIds.includes(item.id)}}">★ 已收藏</view>
       <view class="listing-top">
         <view class="listing-tag">{{item.typeLabel}}</view>
         <view class="listing-price">{{item.priceText}}</view>

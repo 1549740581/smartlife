@@ -5,7 +5,12 @@
         <view class="hero-kicker">SMART LIFE</view>
         <view class="hero-title">{{rental.title}}</view>
       </view>
-      <view class="status status-{{rental.statusClass}} hero-status">{{rental.statusText}}</view>
+      <view class="hero-actions">
+        <view class="favorite-btn {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite" wx:if="{{source === 'public'}}">
+          <text class="favorite-icon">{{isFavorite ? '★' : '☆'}}</text>
+        </view>
+        <view class="status status-{{rental.statusClass}} hero-status">{{rental.statusText}}</view>
+      </view>
     </view>
     <view class="hero-copy">{{rental.description}}</view>
     <view class="detail-badges">
