@@ -5,6 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,4 +58,18 @@ public interface RentalInfoRepository extends JpaRepository<RentalInfo, Long> {
     );
 
     List<RentalInfo> findByPublisherUserIdAndDeletedFalseOrderByCreatedAtDesc(Long publisherUserId);
+
+    Page<RentalInfo> findByDeletedFalse(Pageable pageable);
+
+    Page<RentalInfo> findByStatusAndDeletedFalse(RentalInfo.RentalStatus status, Pageable pageable);
+
+    long countByStatusAndDeletedFalse(RentalInfo.RentalStatus status);
+
+    long countByRentalTypeAndDeletedFalse(RentalInfo.RentalType rentalType);
+
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    List<RentalInfo> findByPublisherUserIdAndDeletedFalse(Long publisherUserId);
+
+    long countByPublisherUserIdAndDeletedFalse(Long publisherUserId);
 }

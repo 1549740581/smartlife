@@ -20,8 +20,8 @@ public class AdminWebMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminAuthInterceptor)
-                .addPathPatterns("/api/admin/**")
-                .excludePathPatterns("/api/admin/login");
+                .addPathPatterns("/api/admin/**", "/api/admin-web/**")
+                .excludePathPatterns("/api/admin/login", "/api/admin-web/qrcode", "/api/admin-web/qrcode/status", "/api/admin-web/qrcode/confirm");
     }
 
     @Override

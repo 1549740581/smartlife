@@ -3,6 +3,10 @@ package com.yxtech.smartlife.repository;
 import com.yxtech.smartlife.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +33,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsernameAndDeletedFalseAndIdNot(String username, Long id);
 
     boolean existsByEmailAndDeletedFalseAndIdNot(String email, Long id);
+
+    Page<User> findByStatus(User.UserStatus status, Pageable pageable);
+
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }
