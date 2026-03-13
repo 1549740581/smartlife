@@ -110,6 +110,8 @@ Page({
     const currentUser = getApp().getCurrentUser();
     if (!currentUser || !currentUser.userId || !rentalIds.length) {
       this.setData({ favoriteIds: [] });
+      const rentals = (this.data.rentals || []).map(r => ({ ...r, isFavorited: false }));
+      this.setData({ rentals });
       return;
     }
     try {
@@ -121,7 +123,12 @@ Page({
           rentalInfoIds: rentalIds
         }
       });
-      this.setData({ favoriteIds: favoriteIds || [] });
+      const idSet = new Set((favoriteIds || []).map(Number));
+      const rentals = (this.data.rentals || []).map(r => ({
+        ...r,
+        isFavorited: idSet.has(Number(r.id))
+      }));
+      this.setData({ favoriteIds: Array.from(idSet), rentals });
     } catch (err) {
       console.error('Load favorite status failed:', err);
     }

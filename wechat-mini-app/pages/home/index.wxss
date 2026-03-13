@@ -40,7 +40,8 @@
 
 .favorite-badge {
   position: absolute;
-  top: 16rpx;
+  top: auto;
+  bottom: 16rpx;
   right: 16rpx;
   background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
   color: #fff;
