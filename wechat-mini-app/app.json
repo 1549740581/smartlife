@@ -5,7 +5,9 @@
     "pages/publish/index",
     "pages/mine/index",
     "pages/admin/index",
-    "pages/rental-detail/index"
+    "pages/rental-detail/index",
+    "pages/conversation-list/index",
+    "pages/conversation-detail/index"
   ],
   "window": {
     "navigationBarTitleText": "Smart Life",

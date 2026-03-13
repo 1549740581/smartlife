@@ -10,7 +10,8 @@ const STATUS_LABELS = {
   APPROVED: '已通过',
   PENDING: '待审核',
   REJECTED: '已驳回',
-  OFFLINE: '已下架'
+  OFFLINE: '已下架',
+  RENTED: '已出租'
 };
 
 function buildStatusText(rental) {
@@ -32,7 +33,8 @@ Page({
     rentalId: null,
     source: 'public',
     rental: null,
-    loading: false
+    loading: false,
+    openingConversation: false
   },
   onLoad(options) {
     this.setData({
@@ -151,5 +153,50 @@ Page({
       clearAdminSessionIfUnauthorized(err);
       wx.showToast({ title: String(err), icon: 'none' });
     }
+  },
+  async rentNow() {
+    const rental = this.data.rental;
+    const currentUser = getApp().getCurrentUser();
+    if (!currentUser || !currentUser.userId) {
+      wx.navigateTo({ url: '/pages/login/index' });
+      return;
+    }
+    if (!rental || this.data.openingConversation) {
+      return;
+    }
+    if (Number(rental.publisherUserId) === Number(currentUser.userId)) {
+      wx.showToast({ title: '不能给自己的房源发起租赁沟通', icon: 'none' });
+      return;
+    }
+    if (rental.rentalType === 'ITEM') {
+      wx.showToast({ title: '闲置物品暂不支持租赁订单', icon: 'none' });
+      return;
+    }
+    try {
+      this.setData({ openingConversation: true });
+      const conversationId = await request({
+        url: `/api/rentals/${rental.id}/conversation`,
+        method: 'POST',
+        data: {
+          userId: currentUser.userId
+        }
+      });
+      wx.navigateTo({ url: `/pages/conversation-detail/index?id=${conversationId}` });
+    } catch (err) {
+      wx.showToast({ title: String(err), icon: 'none' });
+    } finally {
+      this.setData({ openingConversation: false });
+    }
+  },
+  goConversationList() {
+    const rental = this.data.rental;
+    const currentUser = getApp().getCurrentUser();
+    if (!rental || !currentUser || !currentUser.userId) {
+      wx.navigateTo({ url: '/pages/login/index' });
+      return;
+    }
+    wx.navigateTo({
+      url: `/pages/conversation-list/index?rentalId=${rental.id}&title=${encodeURIComponent(rental.title)}`
+    });
   }
 });

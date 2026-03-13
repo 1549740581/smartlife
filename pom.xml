@@ -236,7 +236,8 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>4.20.0</version>
                 <configuration>
-                    <changeLogFile>app-core/src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
+                    <changeLogFile>db/changelog/db.changelog-master.xml</changeLogFile>
+                    <searchPath>app-core/src/main/resources</searchPath>
                 </configuration>
                 <dependencies>
                     <dependency>

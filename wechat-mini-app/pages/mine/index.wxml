@@ -11,6 +11,7 @@
     </view>
     <view class="action-grid">
       <button class="button action-button" bindtap="goPublish">我要发布</button>
+      <button class="button button-secondary action-button" bindtap="goConversations">{{isGuest ? '登录后沟通' : '租赁沟通'}}</button>
       <button class="button button-secondary action-button" wx:if="{{isGuest}}" bindtap="goLogin">去登录</button>
       <button class="button button-secondary action-button" wx:if="{{!isGuest}}" bindtap="switchAccount">切换账号</button>
       <button class="button button-secondary action-button" wx:if="{{canReview}}" bindtap="goAdmin">后台审核</button>
@@ -42,6 +43,9 @@
         <view class="record-desc">{{item.description}}</view>
         <view class="record-meta">{{item.typeLabel}} · {{item.priceText}}</view>
         <view class="record-meta">位置：{{item.locationText || '杭州 / 未填写小区'}}</view>
+        <view class="record-meta" wx:if="{{item.status === 'RENTED' && item.rentStartDate && item.rentEndDate}}">
+          出租周期：{{item.rentStartDate}} 至 {{item.rentEndDate}}
+        </view>
         <view class="record-meta">联系人：{{item.contactName}} {{item.contactPhone}}</view>
         <view class="record-reason" wx:if="{{item.rejectReason}}">驳回原因：{{item.rejectReason}}</view>
       </view>

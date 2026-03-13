@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -51,6 +52,12 @@ public class RentalInfo extends BaseEntity {
     @Column(name = "community_name", length = 128)
     private String communityName;
 
+    @Column(name = "rent_start_date")
+    private LocalDate rentStartDate;
+
+    @Column(name = "rent_end_date")
+    private LocalDate rentEndDate;
+
     @Column(name = "image_urls", length = 4000)
     private String imageUrls;
 
@@ -77,6 +84,7 @@ public class RentalInfo extends BaseEntity {
         PENDING,
         APPROVED,
         REJECTED,
-        OFFLINE
+        OFFLINE,
+        RENTED
     }
 }

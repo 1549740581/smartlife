@@ -7,7 +7,8 @@ import com.yxtech.smartlife.exception.UnauthorizedException;
 import com.yxtech.smartlife.repository.AdminRepository;
 import com.yxtech.smartlife.dto.AdminLoginResponse;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -22,7 +23,6 @@ import java.time.Duration;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @DependsOnDatabaseInitialization
 public class AdminAuthService {
 
@@ -31,6 +31,21 @@ public class AdminAuthService {
     private final Clock adminAuthClock;
     private final AdminAuthProperties adminAuthProperties;
     private final StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    public AdminAuthService(
+            AdminRepository adminRepository,
+            PasswordEncoder passwordEncoder,
+            @Qualifier("adminAuthClock") Clock adminAuthClock,
+            AdminAuthProperties adminAuthProperties,
+            StringRedisTemplate stringRedisTemplate
+    ) {
+        this.adminRepository = adminRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.adminAuthClock = adminAuthClock;
+        this.adminAuthProperties = adminAuthProperties;
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
 
     @PostConstruct
     public void ensureDefaultAdmin() {

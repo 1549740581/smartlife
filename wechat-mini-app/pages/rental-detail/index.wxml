@@ -28,6 +28,27 @@
       </view>
     </view>
     <button class="button" bindtap="callContact">拨打电话</button>
+    <button
+      class="button button-secondary"
+      wx:if="{{source === 'public' && rental.rentalType !== 'ITEM'}}"
+      loading="{{openingConversation}}"
+      disabled="{{openingConversation}}"
+      bindtap="rentNow"
+    >
+      {{openingConversation ? '进入沟通中...' : '我想租'}}
+    </button>
+    <button
+      class="button button-secondary"
+      wx:if="{{source === 'mine' && rental.rentalType !== 'ITEM'}}"
+      bindtap="goConversationList"
+    >
+      查看租赁沟通
+    </button>
+  </view>
+
+  <view class="note-card" wx:if="{{rental.status === 'RENTED' && rental.rentStartDate && rental.rentEndDate}}">
+    <view class="section-title">出租状态</view>
+    <view class="meta">当前出租周期：{{rental.rentStartDate}} 至 {{rental.rentEndDate}}</view>
   </view>
 
   <view class="card" wx:if="{{rental.imageUrls && rental.imageUrls.length}}">

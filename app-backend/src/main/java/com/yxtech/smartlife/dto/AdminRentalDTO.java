@@ -6,6 +6,7 @@ import com.yxtech.smartlife.entity.RentalInfo;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,8 @@ public class AdminRentalDTO {
     private String district;
     private String street;
     private String communityName;
+    private LocalDate rentStartDate;
+    private LocalDate rentEndDate;
     private List<String> imageUrls;
     private RentalInfo.RentalStatus status;
     private String rejectReason;
@@ -46,6 +49,8 @@ public class AdminRentalDTO {
         dto.setDistrict(rentalInfo.getDistrict());
         dto.setStreet(rentalInfo.getStreet());
         dto.setCommunityName(rentalInfo.getCommunityName());
+        dto.setRentStartDate(rentalInfo.getRentStartDate());
+        dto.setRentEndDate(rentalInfo.getRentEndDate());
         dto.setImageUrls(parseImageUrls(rentalInfo.getImageUrls(), objectMapper));
         dto.setStatus(rentalInfo.getStatus());
         dto.setRejectReason(rentalInfo.getRejectReason());

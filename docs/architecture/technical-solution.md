@@ -19,7 +19,7 @@
 - 后端使用 `code` 作为模拟 `openId`
 - 若用户不存在则自动注册
 - 小程序默认以访客身份进入，不强制先登录
-- 发布操作在前端先完成基础表单校验，再调用后端接口
+- 发布、租赁沟通、下单等操作在前端先完成基础校验，再调用后端接口
 
 ### 管理员
 
@@ -31,10 +31,6 @@
 - Redis 开启持久化，保证 Java 服务重启后管理员未过期会话仍可继续使用
 - 支持主动退出登录
 - 管理侧鉴权统一由 MVC 拦截器完成，控制器通过请求上下文读取当前管理员
-
-说明：
-
-- 该方案适合 MVP 阶段，后续可演进为 JWT 或 Spring Security 正式认证
 
 ## 3. 数据建模方案
 
@@ -50,10 +46,11 @@
 
 ### RentalInfo
 
-- 用单表承载房屋与车位
-- 当前也承载闲置物品
+- 用单表承载房屋、车位和闲置物品
 - 通过 `rentalType` 区分类型
 - 图片以 JSON 字符串落库，避免首期引入对象存储
+- 生效出租订单存在时，房源状态切换为 `RENTED`
+- 生效订单的起止日期同步回写到 `rentStartDate / rentEndDate`
 
 ### AddressOption
 
@@ -61,6 +58,15 @@
 - 当前采用叶子表存储 `city / district / street / community_name`
 - 用户侧通过 `/api/addresses/tree` 获取树形结构
 - 当前城市能力限制为杭州，后续再扩展多城市
+
+### RentalConversation / RentalOrder / RentalMessage
+
+- “微信沟通”首期按站内消息实现，不直接对接真实微信 IM
+- `RentalConversation` 作为“房源/车位 + 房东 + 租客”的唯一会话主键
+- 租客通过消息页发送文本和租期卡片
+- 房东确认租期卡片后生成生效订单
+- 取消、续约和到期提醒都围绕订单实体流转
+- 到期前 15 天提醒和到期自动完成由定时任务驱动
 
 ### ReviewRecord
 
@@ -72,9 +78,8 @@
 ### 小程序导航与页面组织
 
 - 小程序底部固定两个一级入口：`生活广场`、`个人中心`
-- `生活广场` 承载公开列表和类型筛选
-- `生活广场` 当前支持关键词、类型、地址多条件筛选
-- `个人中心` 承载用户信息、我要发布、我的发布、账号切换和审核入口
+- `生活广场` 承载公开列表和搜索筛选
+- `个人中心` 承载用户信息、我要发布、租赁沟通、我的发布、账号切换和审核入口
 - `后台审核` 为审核员条件展示页面入口，不直接出现在公共导航中
 
 ### 用户侧
@@ -85,6 +90,15 @@
 - `/api/rentals`
 - `/api/rentals/type/{type}`
 - `/api/rentals/user/{userId}`
+- `/api/rentals/{id}/conversation`
+- `/api/rental-conversations`
+- `/api/rental-conversations/{conversationId}`
+- `/api/rental-conversations/{conversationId}/messages`
+- `/api/rental-conversations/{conversationId}/orders`
+- `/api/rental-orders/{id}/accept`
+- `/api/rental-orders/{id}/cancel/request`
+- `/api/rental-orders/{id}/cancel/confirm`
+- `/api/rental-orders/{id}/renew`
 
 ### 管理侧
 
@@ -94,6 +108,8 @@
 - `/api/admin/rentals`
 - `/api/admin/rentals/{id}/review`
 - `/api/admin/rentals/{id}/offline`
+- `/api/admin/orders`
+- `/api/admin/orders/{id}/cancel`
 
 ## 5. 状态流转
 
@@ -107,11 +123,24 @@
 - `PENDING -> REJECTED`
 - `APPROVED -> OFFLINE`
 
+### 出租订单流程
+
+- 租客发送租期卡片后创建 `PENDING_CONFIRMATION` 订单
+- 房东确认后切换为 `ACTIVE`
+- 生效订单会把对应房源切换为 `RENTED`
+- 生效订单会把对应的 `rentStartDate / rentEndDate` 回写到 `rental_info`
+- 任一方可发起取消，订单进入 `CANCEL_PENDING`
+- 双方同意后订单变为 `CANCELED`，房源恢复 `APPROVED`
+- 到期后订单转为 `COMPLETED`
+- 续约通过新建订单实现
+
 ### 约束
 
 - 审核拒绝必须填写原因
 - 不能对非 `PENDING` 数据再次执行审核
 - 不能对非 `APPROVED` 数据执行下架
+- 同一房源在交叉时间段内只能存在一个有效订单
+- 已出租房源不会出现在公开广场，但原有会话仍可继续查看
 
 ## 6. 测试方案
 
@@ -120,30 +149,34 @@
 - `RentalService`
 - `AdminAuthService`
 - `AdminRentalService`
+- `RentalTradeServiceImpl`
 
 ### Web 层测试
 
 - 用户发布接口
 - 公开列表接口
 - 管理员审核接口
+- 租赁沟通与订单接口
+- 管理员订单取消接口
 
 ### 前端验证
 
 - 首期以前端页面联调验证为主，不单独引入小程序测试框架
-- 当前已形成“访客浏览 -> 模拟登录 -> 发布 -> 审核 -> 浏览”的本地联调闭环
-- 发布页承担基础输入校验和提交态控制，后端继续作为最终校验边界
+- 当前已形成“访客浏览 -> 模拟登录 -> 发布 -> 审核 -> 沟通 -> 订单流转”的本地联调闭环
 
 ### 集成测试实现
 
 - 后端涉及 MySQL / Redis 的测试统一通过 Testcontainers 启动容器
-- Liquibase baseline 在集成测试启动阶段自动执行
+- Liquibase baseline 与增量脚本在集成测试启动阶段自动执行
 
 ## 7. 数据库迁移策略
 
-- 当前已收敛为单份 Liquibase baseline：`db/changelog/v1.0/000-baseline.sql`
-- 新库初始化直接执行 baseline，避免长期维护一串仅用于历史演进的初始化 SQL
-- 后续新增结构变更时，在 baseline 之后继续追加新的增量脚本
+- 当前基线脚本为 `db/changelog/v1.0/000-baseline.sql`
+- 租赁沟通与订单结构通过 `db/changelog/v1.0/001-add-rental-trade.sql` 追加
+- 本地演示会话和订单数据通过 `db/changelog/v1.0/002-seed-rental-trade-demo.sql` 追加
+- 新库初始化按 `000 -> 001 -> 002` 顺序执行
+- 后续新增结构或演示数据调整都继续追加新的增量脚本，不回写已发布 changeset
 
 ## 8. 目录选择说明
 
-当前仓库已有 `wechat-mini-app/` 目录，因此本次实现默认使用该目录作为小程序客户端目录，暂不额外创建 `miniprogram/`，避免重复维护。
+当前仓库已有 `wechat-mini-app/` 目录，因此本次实现继续使用该目录作为小程序客户端目录，暂不额外创建 `miniprogram/`，避免重复维护。

@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset smart-life:001-baseline-schema
+--changeset smart-life:001-baseline-schema logicalFilePath:db/changelog/v1.0/000-baseline.sql
 ALTER DATABASE CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS address_option (
     CONSTRAINT uk_address_option UNIQUE (city, district, street, community_name)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
---changeset smart-life:002-baseline-seed
+--changeset smart-life:002-baseline-seed logicalFilePath:db/changelog/v1.0/000-baseline.sql
 INSERT INTO admins (id, username, password_hash, display_name, status, deleted)
 SELECT
     1,

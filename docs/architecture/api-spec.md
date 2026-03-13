@@ -1,6 +1,6 @@
 # API 规范草案
 
-本文件定义当前首期接口规范方向。正式实现时，应基于此文件继续收敛为更具体的 OpenAPI 定义。
+本文件描述当前代码已实现并用于小程序联调的接口集合，字段示例以当前 MVP 为准。
 
 ## 1. 通用规则
 
@@ -45,20 +45,6 @@
 }
 ```
 
-响应示例：
-
-```json
-{
-  "code": "OK",
-  "message": "success",
-  "data": {
-    "userId": 10003,
-    "openId": "wx-user-10003",
-    "nickname": "房东陈姐"
-  }
-}
-```
-
 说明：
 
 - 小程序前端默认允许访客不登录直接浏览公开列表
@@ -98,46 +84,10 @@
 - 小程序发布页会在调用接口前进行标题、描述、价格、联系人、联系电话的前端校验
 - 发布地址必须命中地址表中存在的地址组合
 - 当前 `city` 仅支持 `杭州`
-- 提交成功后前端回到个人中心查看发布状态
 
 ### 地址树查询
 
 - `GET /api/addresses/tree`
-
-响应示例：
-
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": [
-    {
-      "label": "杭州",
-      "value": "杭州",
-      "children": [
-        {
-          "label": "滨江区",
-          "value": "滨江区",
-          "children": [
-            {
-              "label": "长河街道",
-              "value": "长河街道",
-              "children": [
-                {
-                  "label": "卓悦华庭",
-                  "value": "卓悦华庭",
-                  "children": []
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "timestamp": 1710000000000
-}
-```
 
 说明：
 
@@ -162,7 +112,6 @@
 - 访客与登录用户查询结果一致
 - `type` 允许值为 `HOUSE`、`PARKING`、`ITEM`
 - 支持查询参数：`keyword`、`type`、`city`、`district`、`street`、`communityName`
-- 小程序公开列表通过底部 `生活广场` 入口承载，支持关键词、类型和地址筛选
 
 ### 查询我的发布
 
@@ -171,8 +120,153 @@
 
 说明：
 
-- 返回用户自己的全部状态数据，包括 `PENDING`、`APPROVED`、`REJECTED`、`OFFLINE`
-- 小程序 `个人中心` 使用该接口展示“我的发布”列表
+- 返回用户自己的全部状态数据，包括 `PENDING`、`APPROVED`、`REJECTED`、`OFFLINE`、`RENTED`
+
+### 打开租赁沟通
+
+- `POST /api/rentals/{rentalId}/conversation`
+
+请求示例：
+
+```json
+{
+  "userId": 10004
+}
+```
+
+说明：
+
+- 仅房屋和车位支持发起沟通
+- 房东不能给自己的信息发起沟通
+- 仅 `APPROVED` 信息可新开沟通；已出租信息仅允许已存在会话继续进入
+
+### 查询我的沟通列表
+
+- `GET /api/rental-conversations?userId=10004`
+
+返回要点：
+
+- 返回当前用户作为房东或租客参与的全部会话
+- 包含 `latestOrder`、`lastMessagePreview`、`rentStartDate`、`rentEndDate`
+- 小程序“个人中心 -> 租赁沟通”使用该接口
+
+### 查询沟通详情
+
+- `GET /api/rental-conversations/{conversationId}?userId=10004`
+
+返回要点：
+
+- 返回会话基本信息、当前用户角色、对应房源信息
+- `messages` 同时承载文本消息、租期卡片消息和系统提醒
+- `orders` 按创建时间倒序返回
+
+### 发送文字消息
+
+- `POST /api/rental-conversations/{conversationId}/messages`
+
+请求示例：
+
+```json
+{
+  "userId": 10004,
+  "content": "我想先租三个月，可以吗？"
+}
+```
+
+### 发送租期卡片
+
+- `POST /api/rental-conversations/{conversationId}/orders`
+
+请求示例：
+
+```json
+{
+  "userId": 10004,
+  "startDate": "2026-04-01",
+  "endDate": "2026-06-30"
+}
+```
+
+说明：
+
+- 仅租客可以创建租期卡片
+- 仅房屋和车位支持下单
+- 交叉时间段内不能重复创建 `PENDING_CONFIRMATION` / `ACTIVE` / `CANCEL_PENDING` 订单
+- 创建后订单状态为 `PENDING_CONFIRMATION`
+
+### 房东确认订单
+
+- `POST /api/rental-orders/{id}/accept`
+
+请求示例：
+
+```json
+{
+  "userId": 10003
+}
+```
+
+说明：
+
+- 仅房东可确认
+- 确认后订单变为 `ACTIVE`
+- 对应房源或车位状态切换为 `RENTED`
+
+### 发起取消申请
+
+- `POST /api/rental-orders/{id}/cancel/request`
+
+请求示例：
+
+```json
+{
+  "userId": 10004,
+  "reason": "计划有变，想提前结束租期"
+}
+```
+
+说明：
+
+- `PENDING_CONFIRMATION` 订单取消后直接变为 `CANCELED`
+- `ACTIVE` 订单取消后先进入 `CANCEL_PENDING`
+- `reason` 当前为可选字段，前端可透传给对方和管理员查看
+
+### 确认取消申请
+
+- `POST /api/rental-orders/{id}/cancel/confirm`
+
+请求示例：
+
+```json
+{
+  "userId": 10003
+}
+```
+
+说明：
+
+- 双方都确认后，订单变为 `CANCELED`
+- 对应房源恢复为 `APPROVED`
+
+### 续约
+
+- `POST /api/rental-orders/{id}/renew`
+
+请求示例：
+
+```json
+{
+  "userId": 10004,
+  "startDate": "2026-03-28",
+  "endDate": "2026-05-31"
+}
+```
+
+说明：
+
+- 仅 `ACTIVE` 或 `COMPLETED` 订单支持续约
+- 续约起始日期必须晚于原订单结束日期
+- 续约通过新订单表达，不覆盖原订单
 
 ## 3. 管理侧接口
 
@@ -189,26 +283,10 @@
 }
 ```
 
-响应示例：
-
-```json
-{
-  "code": 200,
-  "message": "success",
-  "data": {
-    "adminId": 1,
-    "displayName": "系统管理员",
-    "adminToken": "token-123",
-    "expiresAt": "2026-03-12 14:00:00"
-  }
-}
-```
-
 说明：
 
 - 小程序 UI 层只对指定审核员用户展示“后台审核”入口
-- 后端管理接口仍以 `X-Admin-Token` 作为鉴权依据
-- 当前审核入口集成在小程序 `个人中心` 中，不单独提供独立后台前端
+- 后端管理接口以 `X-Admin-Token` 作为鉴权依据
 - 会话保存在 Redis 中，服务重启后未过期 token 仍可用
 
 ### 管理员退出
@@ -219,47 +297,37 @@
 
 - `GET /api/admin/rentals/pending`
 
-### 获取全部租赁信息
-
-- `GET /api/admin/rentals`
-
-### 获取租赁信息详情
-
-- `GET /api/admin/rentals/{id}`
-
-### 审核信息
+### 审核租赁信息
 
 - `POST /api/admin/rentals/{id}/review`
-
-请求示例：
-
-```json
-{
-  "action": "APPROVE",
-  "approved": true,
-  "reason": ""
-}
-```
-
-拒绝示例：
-
-```json
-{
-  "action": "REJECT",
-  "approved": false,
-  "reason": "联系方式不完整"
-}
-```
 
 ### 强制下架
 
 - `POST /api/admin/rentals/{id}/offline`
 
-## 4. 约束
+### 获取出租订单列表
 
-- 所有写接口必须做参数校验
-- 所有状态流转必须校验当前状态是否合法
-- 所有管理端接口默认需要鉴权
-- 审核入口的前端展示规则由小程序本地用户角色控制
-- 小程序固定使用底部双 Tab：`生活广场`、`个人中心`
-- 错误码应集中维护，避免字符串散落
+- `GET /api/admin/orders`
+
+返回要点：
+
+- 返回全部未删除订单
+- 包含房源标题、房源状态、房东昵称、租客昵称、提醒时间、取消原因等字段
+
+### 管理员取消订单
+
+- `POST /api/admin/orders/{id}/cancel`
+
+请求示例：
+
+```json
+{
+  "reason": "管理员取消订单"
+}
+```
+
+说明：
+
+- 通过 `X-Admin-Token` 鉴权
+- 仅未取消、未完成的订单允许管理员直接取消
+- 取消后订单状态变为 `CANCELED`，对应房源重新公开

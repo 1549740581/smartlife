@@ -10,7 +10,8 @@ const STATUS_LABELS = {
   APPROVED: '已通过',
   PENDING: '待审核',
   REJECTED: '已驳回',
-  OFFLINE: '已下架'
+  OFFLINE: '已下架',
+  RENTED: '已出租'
 };
 
 Page({
@@ -68,6 +69,14 @@ Page({
       return;
     }
     wx.navigateTo({ url: '/pages/publish/index' });
+  },
+  goConversations() {
+    const user = getApp().getCurrentUser();
+    if (!user || !user.userId) {
+      wx.navigateTo({ url: '/pages/login/index' });
+      return;
+    }
+    wx.navigateTo({ url: '/pages/conversation-list/index' });
   },
   goLogin() {
     wx.navigateTo({ url: '/pages/login/index' });

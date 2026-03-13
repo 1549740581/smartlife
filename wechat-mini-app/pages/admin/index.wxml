@@ -24,7 +24,7 @@
       </view>
       <view class="hero-copy">会话有效期至：{{expiresAt || '-'}}</view>
       <view class="demo-action-row">
-        <button class="button button-secondary demo-button" bindtap="loadPending">刷新列表</button>
+        <button class="button button-secondary demo-button" bindtap="loadDashboard">刷新列表</button>
         <button class="button button-secondary demo-button" bindtap="logout">退出登录</button>
       </view>
     </view>
@@ -44,9 +44,56 @@
         <view class="record-meta">{{item.priceText}} · 联系人：{{item.contactName}} {{item.contactPhone}}</view>
         <view class="admin-actions">
           <button class="button button-secondary admin-button" data-id="{{item.id}}" bindtap="goDetail">查看详情</button>
-          <button class="button admin-button" data-id="{{item.id}}" data-approved="true" bindtap="review">审核通过</button>
-          <button class="button button-secondary admin-button" data-id="{{item.id}}" data-approved="false" bindtap="review">审核拒绝</button>
+          <button class="button admin-button" data-id="{{item.id}}" loading="{{reviewingId === item.id}}" disabled="{{reviewingId === item.id}}" bindtap="approveReview">审核通过</button>
+          <button class="button button-secondary admin-button" data-id="{{item.id}}" disabled="{{reviewingId === item.id}}" bindtap="openRejectForm">审核拒绝</button>
         </view>
+        <view class="reject-panel" wx:if="{{activeRejectId === item.id}}">
+          <view class="label">拒绝原因</view>
+          <textarea
+            class="textarea reject-textarea"
+            placeholder="请输入拒绝原因，发布者会在个人中心看到"
+            maxlength="200"
+            data-id="{{item.id}}"
+            bindinput="onRejectReasonInput"
+            value="{{rejectReasons[item.id] || ''}}"
+          />
+          <view class="admin-actions inline-actions">
+            <button class="button button-secondary admin-button" bindtap="cancelReject" disabled="{{reviewingId === item.id}}">取消</button>
+            <button class="button admin-button" data-id="{{item.id}}" loading="{{reviewingId === item.id}}" disabled="{{reviewingId === item.id}}" bindtap="submitReject">确认拒绝</button>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <view class="section-head">
+      <view class="section-title">订单管理</view>
+      <view class="section-meta">{{orderList.length}} 条订单</view>
+    </view>
+
+    <view class="empty-card" wx:if="{{!orderList.length}}">
+      <view class="empty-title">暂无订单</view>
+      <view class="meta">租期卡片经房东确认后，会在这里展示并支持管理员直接取消。</view>
+    </view>
+
+    <block wx:for="{{orderList}}" wx:key="id">
+      <view class="record-card">
+        <view class="record-top">
+          <view class="record-title">{{item.rentalTitle}}</view>
+          <view class="listing-tag">{{item.statusLabel}}</view>
+        </view>
+        <view class="record-meta">{{item.typeLabel}} · {{item.dateText}}</view>
+        <view class="record-meta">房东：{{item.landlordNickname || ('用户' + item.landlordUserId)}} · 租客：{{item.tenantNickname || ('用户' + item.tenantUserId)}}</view>
+        <view class="record-reason" wx:if="{{item.cancelReason}}">{{item.cancelReason}}</view>
+        <button
+          class="button button-secondary admin-button"
+          wx:if="{{item.canCancel}}"
+          data-id="{{item.id}}"
+          loading="{{cancelingOrderId === item.id}}"
+          disabled="{{cancelingOrderId === item.id}}"
+          bindtap="cancelOrder"
+        >
+          {{cancelingOrderId === item.id ? '取消中...' : '管理员取消订单'}}
+        </button>
       </view>
     </block>
   </view>

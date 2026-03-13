@@ -7,4 +7,6 @@
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <include file="v1.0/000-baseline.sql" relativeToChangelogFile="true"/>
+    <include file="v1.0/001-add-rental-trade.sql" relativeToChangelogFile="true"/>
+    <include file="v1.0/002-seed-rental-trade-demo.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

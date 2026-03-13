@@ -64,6 +64,8 @@
 - `district`
 - `street`
 - `communityName`
+- `rentStartDate`
+- `rentEndDate`
 - `imageUrls`
 - `status`
 - `rejectReason`
@@ -76,7 +78,7 @@
 约束：
 
 - `rentalType` 仅允许 `HOUSE`、`PARKING`、`ITEM`
-- `status` 仅允许 `PENDING`、`APPROVED`、`REJECTED`、`OFFLINE`
+- `status` 仅允许 `PENDING`、`APPROVED`、`REJECTED`、`OFFLINE`、`RENTED`
 - `rejectReason` 仅在拒绝时必填
 - `city` 当前固定为 `杭州`
 - 发布时 `city + district + street + communityName` 必须命中 `address_option`
@@ -119,15 +121,103 @@
 - 当前以扁平叶子表存储，接口层组装为地址树
 - 当前默认仅初始化 `杭州 / 滨江区 / 长河街道 / 卓悦华庭`
 
-## 6. 状态流转
+## 6. RentalConversation
+
+用途：承载“房源/车位 + 房东 + 租客”维度的唯一沟通会话。
+
+当前字段：
+
+- `id`
+- `rentalInfoId`
+- `landlordUserId`
+- `tenantUserId`
+- `status`
+- `lastMessageAt`
+- `deleted`
+- `createdAt`
+- `updatedAt`
+
+约束：
+
+- 唯一键：`rentalInfoId + landlordUserId + tenantUserId`
+- 当前状态枚举：`OPEN`
+- 会话列表按 `lastMessageAt` 倒序展示
+
+## 7. RentalOrder
+
+用途：承载租客和房东确认的租期订单。
+
+当前字段：
+
+- `id`
+- `conversationId`
+- `rentalInfoId`
+- `landlordUserId`
+- `tenantUserId`
+- `startDate`
+- `endDate`
+- `status`
+- `cancelRequestedBy`
+- `cancelReason`
+- `cancelRequestedAt`
+- `landlordCancelConfirmed`
+- `tenantCancelConfirmed`
+- `renewalFromOrderId`
+- `reminderSentAt`
+- `deleted`
+- `createdAt`
+- `updatedAt`
+
+约束：
+
+- 同一 `rentalInfoId` 在交叉时间段内只能有一个未失效订单
+- 冲突校验针对 `PENDING_CONFIRMATION`、`ACTIVE`、`CANCEL_PENDING`
+- 续约通过新订单表达，不覆盖历史订单
+
+## 8. RentalMessage
+
+用途：承载站内沟通消息和系统提醒。
+
+当前字段：
+
+- `id`
+- `conversationId`
+- `rentalInfoId`
+- `orderId`
+- `senderUserId`
+- `receiverUserId`
+- `messageType`
+- `content`
+- `metadataJson`
+- `deleted`
+- `createdAt`
+- `updatedAt`
+
+约束：
+
+- `messageType` 当前支持 `TEXT`、`ORDER_CARD`、`SYSTEM`
+- `ORDER_CARD` 消息必须关联订单
+- `SYSTEM` 消息由服务端写入，用于确认、取消和到期提醒
+
+## 9. 状态流转
 
 允许的租赁状态流转：
 
 - `PENDING -> APPROVED`
 - `PENDING -> REJECTED`
 - `APPROVED -> OFFLINE`
+- `APPROVED -> RENTED`
+- `RENTED -> APPROVED`
 
-## 7. 建模注意事项
+允许的订单状态流转：
+
+- `PENDING_CONFIRMATION -> ACTIVE`
+- `PENDING_CONFIRMATION -> CANCELED`
+- `ACTIVE -> CANCEL_PENDING`
+- `CANCEL_PENDING -> CANCELED`
+- `ACTIVE -> COMPLETED`
+
+## 10. 建模注意事项
 
 - 图片字段若暂不接对象存储，可先保存为 JSON 数组字符串
 - 所有实体建议继承统一基类以复用主键、时间字段和逻辑删除字段
