@@ -159,6 +159,44 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     @Transactional
+    public RentalInfo userOnlineRental(Long rentalId, Long userId) {
+        RentalInfo rentalInfo = rentalInfoRepository.findByIdAndPublisherUserIdAndDeletedFalse(rentalId, userId)
+                .orElseThrow(() -> new NotFoundException("rental not found"));
+
+        if (rentalInfo.getStatus() != RentalInfo.RentalStatus.OFFLINE) {
+            throw new IllegalArgumentException("only offline rental can be online by owner");
+        }
+
+        RentalInfo.RentalStatus fromStatus = rentalInfo.getStatus();
+        rentalInfo.setStatus(RentalInfo.RentalStatus.APPROVED);
+        RentalInfo saved = rentalInfoRepository.save(rentalInfo);
+
+        // 记录一条用户重新上架操作审计
+        saveReviewRecord(saved.getId(), "USER_ONLINE", fromStatus, saved.getStatus(), null, userId);
+        return saved;
+    }
+
+    @Override
+    @Transactional
+    public RentalInfo userOfflineRental(Long rentalId, Long userId) {
+        RentalInfo rentalInfo = rentalInfoRepository.findByIdAndPublisherUserIdAndDeletedFalse(rentalId, userId)
+                .orElseThrow(() -> new NotFoundException("rental not found"));
+
+        if (rentalInfo.getStatus() != RentalInfo.RentalStatus.APPROVED) {
+            throw new IllegalArgumentException("only approved rental can be offline by owner");
+        }
+
+        RentalInfo.RentalStatus fromStatus = rentalInfo.getStatus();
+        rentalInfo.setStatus(RentalInfo.RentalStatus.OFFLINE);
+        RentalInfo saved = rentalInfoRepository.save(rentalInfo);
+
+        // 记录一条用户下架操作审计
+        saveReviewRecord(saved.getId(), "USER_OFFLINE", fromStatus, saved.getStatus(), null, userId);
+        return saved;
+    }
+
+    @Override
+    @Transactional
     public RentalInfo offlineRental(Long rentalId, Long adminId, String reason) {
         RentalInfo rentalInfo = rentalInfoRepository.findByIdAndDeletedFalse(rentalId)
                 .orElseThrow(() -> new NotFoundException("rental not found"));

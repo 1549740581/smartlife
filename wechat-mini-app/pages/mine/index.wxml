@@ -50,6 +50,12 @@
         </view>
         <view class="record-meta">联系人：{{item.contactName}} {{item.contactPhone}}</view>
         <view class="record-reason" wx:if="{{item.rejectReason}}">驳回原因：{{item.rejectReason}}</view>
+        <view class="record-actions" wx:if="{{item.status === 'APPROVED'}}">
+          <button class="button button-secondary" data-id="{{item.id}}" bindtap="offline">下架</button>
+        </view>
+        <view class="record-actions" wx:if="{{item.status === 'OFFLINE'}}">
+          <button class="button" data-id="{{item.id}}" bindtap="online">重新上架</button>
+        </view>
       </view>
     </block>
   </block>

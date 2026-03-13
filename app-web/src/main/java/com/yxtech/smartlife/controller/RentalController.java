@@ -3,6 +3,7 @@ package com.yxtech.smartlife.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yxtech.smartlife.common.Result;
 import com.yxtech.smartlife.dto.CreateRentalRequest;
+import com.yxtech.smartlife.dto.OfflineRentalRequest;
 import com.yxtech.smartlife.dto.RentalDTO;
 import com.yxtech.smartlife.entity.RentalInfo;
 import com.yxtech.smartlife.service.RentalService;
@@ -95,5 +96,23 @@ public class RentalController {
             @PathVariable("id") Long id
     ) {
         return Result.success(RentalDTO.fromEntity(rentalService.findUserRentalById(userId, id), objectMapper));
+    }
+
+    @PostMapping("/{id}/offline")
+    public Result<RentalDTO> userOfflineRental(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody OfflineRentalRequest request
+    ) {
+        RentalInfo saved = rentalService.userOfflineRental(id, request.getUserId());
+        return Result.success(RentalDTO.fromEntity(saved, objectMapper));
+    }
+
+    @PostMapping("/{id}/online")
+    public Result<RentalDTO> userOnlineRental(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody OfflineRentalRequest request
+    ) {
+        RentalInfo saved = rentalService.userOnlineRental(id, request.getUserId());
+        return Result.success(RentalDTO.fromEntity(saved, objectMapper));
     }
 }

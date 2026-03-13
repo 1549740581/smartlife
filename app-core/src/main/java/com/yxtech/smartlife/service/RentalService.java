@@ -37,4 +37,8 @@ public interface RentalService {
     RentalInfo reviewRental(Long rentalId, Long adminId, boolean approved, String reason);
 
     RentalInfo offlineRental(Long rentalId, Long adminId, String reason);
+
+    RentalInfo userOfflineRental(Long rentalId, Long userId);
+
+    RentalInfo userOnlineRental(Long rentalId, Long userId);
 }

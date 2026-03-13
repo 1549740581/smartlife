@@ -102,5 +102,43 @@ Page({
   },
   goFavorites() {
     wx.navigateTo({ url: '/pages/favorites/index' });
+  },
+  async offline(e) {
+    const id = e.currentTarget.dataset.id;
+    const user = getApp().getCurrentUser();
+    if (!user || !user.userId) {
+      wx.navigateTo({ url: '/pages/login/index' });
+      return;
+    }
+    try {
+      await request({
+        url: `/api/rentals/${id}/offline`,
+        method: 'POST',
+        data: { userId: user.userId }
+      });
+      wx.showToast({ title: '已下架', icon: 'success' });
+      this.loadRentals(user.userId);
+    } catch (err) {
+      wx.showToast({ title: String(err), icon: 'none' });
+    }
+  },
+  async online(e) {
+    const id = e.currentTarget.dataset.id;
+    const user = getApp().getCurrentUser();
+    if (!user || !user.userId) {
+      wx.navigateTo({ url: '/pages/login/index' });
+      return;
+    }
+    try {
+      await request({
+        url: `/api/rentals/${id}/online`,
+        method: 'POST',
+        data: { userId: user.userId }
+      });
+      wx.showToast({ title: '已重新上架', icon: 'success' });
+      this.loadRentals(user.userId);
+    } catch (err) {
+      wx.showToast({ title: String(err), icon: 'none' });
+    }
   }
 });

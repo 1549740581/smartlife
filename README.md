@@ -233,6 +233,8 @@ mvn -pl app-starter -am clean spring-boot:run -Dspring-boot.run.profiles=local
 - `POST /api/favorites/check`
 - `POST /api/favorites/list`
 - `POST /api/favorites/filter-ids`
+- `POST /api/rentals/{id}/offline` 用户主动下架（仅发布者，状态为 APPROVED 可下架）
+- `POST /api/rentals/{id}/online` 用户重新上架（仅发布者，状态为 OFFLINE 可上架为 APPROVED）
 
 ### 管理侧
 
