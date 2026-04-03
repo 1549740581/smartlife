@@ -12,4 +12,5 @@
     <include file="v1.0/003-add-complaint.sql" relativeToChangelogFile="true"/>
     <include file="v1.0/004-add-message-read.sql" relativeToChangelogFile="true"/>
     <include file="v1.0/005-add-user-favorite.sql" relativeToChangelogFile="true"/>
+    <include file="v1.0/006-add-house-detail.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

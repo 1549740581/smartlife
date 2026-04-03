@@ -7,6 +7,7 @@ const TYPE_LABELS = {
 };
 
 const STATUS_LABELS = {
+  DRAFT: '草稿',
   APPROVED: '已通过',
   PENDING: '待审核',
   REJECTED: '已驳回',
@@ -59,8 +60,12 @@ Page({
     }
   },
   goDetail(e) {
-    const { id } = e.currentTarget.dataset;
-    wx.navigateTo({ url: `/pages/rental-detail/index?id=${id}&source=mine` });
+    const { id, status } = e.currentTarget.dataset;
+    if (status === 'DRAFT' || status === 'REJECTED') {
+      wx.navigateTo({ url: `/pages/publish/index?id=${id}` });
+    } else {
+      wx.navigateTo({ url: `/pages/rental-detail/index?id=${id}&source=mine` });
+    }
   },
   goPublish() {
     const user = getApp().getCurrentUser();

@@ -81,6 +81,7 @@ public class RentalInfo extends BaseEntity {
     }
 
     public enum RentalStatus {
+        DRAFT,
         PENDING,
         APPROVED,
         REJECTED,

@@ -37,7 +37,7 @@
 
   <block wx:if="{{!isGuest}}">
     <block wx:for="{{rentals}}" wx:key="id">
-      <view class="record-card" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="record-card" data-id="{{item.id}}" data-status="{{item.status}}" bindtap="goDetail">
         <view class="record-top">
           <view class="record-title">{{item.title}}</view>
           <view class="status status-{{item.statusClass}}">{{item.statusLabel}}</view>

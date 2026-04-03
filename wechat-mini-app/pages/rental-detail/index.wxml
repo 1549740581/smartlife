@@ -63,6 +63,54 @@
     <view class="meta">当前出租周期：{{rental.rentStartDate}} 至 {{rental.rentEndDate}}</view>
   </view>
 
+  <view class="card" wx:if="{{rental.houseDetail && rental.rentalType === 'HOUSE'}}">
+    <view class="section-title">房屋详情</view>
+    <view class="detail-grid">
+      <view class="detail-item">
+        <view class="detail-label">楼层</view>
+        <view class="detail-value">{{rental.houseDetail.floor}}层</view>
+      </view>
+      <view class="detail-item">
+        <view class="detail-label">户型</view>
+        <view class="detail-value">{{rental.houseDetail.bedroomCount}}室{{rental.houseDetail.livingRoomCount}}厅{{rental.houseDetail.kitchenCount}}厨{{rental.houseDetail.bathroomCount}}卫</view>
+      </view>
+      <view class="detail-item">
+        <view class="detail-label">朝向</view>
+        <view class="detail-value">{{rental.houseDetail.orientationLabel}}</view>
+      </view>
+      <view class="detail-item">
+        <view class="detail-label">阳台</view>
+        <view class="detail-value">{{rental.houseDetail.hasBalcony ? '有' : '无'}}</view>
+      </view>
+      <view class="detail-item">
+        <view class="detail-label">电梯</view>
+        <view class="detail-value">{{rental.houseDetail.hasElevator ? '有' : '无'}}</view>
+      </view>
+      <view class="detail-item">
+        <view class="detail-label">物业费</view>
+        <view class="detail-value">{{rental.houseDetail.propertyFee}}元/月</view>
+      </view>
+      <view class="detail-item">
+        <view class="detail-label">水费</view>
+        <view class="detail-value">{{rental.houseDetail.waterFee}}元/吨</view>
+      </view>
+      <view class="detail-item">
+        <view class="detail-label">电费</view>
+        <view class="detail-value">{{rental.houseDetail.electricityFee}}元/度</view>
+      </view>
+    </view>
+    <view class="detail-row" wx:if="{{rental.houseDetail.applianceLabels && rental.houseDetail.applianceLabels.length}}">
+      <view class="detail-label">家电家具</view>
+      <view class="detail-tags">
+        <view class="detail-tag" wx:for="{{rental.houseDetail.applianceLabels}}" wx:key="*this">{{item}}</view>
+      </view>
+    </view>
+    <view class="detail-row" wx:if="{{rental.houseDetail.extraInfo}}">
+      <view class="detail-label">其他信息</view>
+      <view class="detail-text">{{rental.houseDetail.extraInfo}}</view>
+    </view>
+  </view>
+
   <view class="card" wx:if="{{rental.imageUrls && rental.imageUrls.length}}">
     <view class="section-title">图片</view>
     <scroll-view class="image-list" scroll-x="true" enhanced="true" show-scrollbar="false">

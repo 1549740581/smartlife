@@ -101,3 +101,54 @@
   background: #e5e7eb;
   box-shadow: 0 10rpx 22rpx rgba(21, 37, 63, 0.12);
 }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+  padding: 16rpx 0;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.detail-label {
+  font-size: 24rpx;
+  color: #7b8798;
+}
+
+.detail-value {
+  font-size: 28rpx;
+  color: #18212f;
+  font-weight: 500;
+}
+
+.detail-row {
+  padding: 16rpx 0;
+  border-top: 1rpx solid #eef2f7;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.detail-tag {
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+  background: #f3f4f6;
+  font-size: 24rpx;
+  color: #374151;
+}
+
+.detail-text {
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: #374151;
+  line-height: 1.6;
+}

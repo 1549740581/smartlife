@@ -19,23 +19,38 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate])
 
+  const isDev = import.meta.env.DEV
+
+  const devLogin = async () => {
+    setLoading(true)
+    try {
+      const res: any = await request.post('/qrcode', {})
+      await request.post('/qrcode/confirm', { ticket: res.ticket, adminId: 1 })
+      const statusRes: any = await request.post('/qrcode/status', { ticket: res.ticket })
+      if (statusRes.status === 'CONFIRMED') {
+        setAuth(statusRes.token, { id: statusRes.adminId, displayName: statusRes.displayName })
+        message.success('登录成功')
+        navigate('/dashboard', { replace: true })
+      }
+    } catch {
+      message.error('登录失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const fetchQrCode = async () => {
     setLoading(true)
     try {
       const res: any = await request.post('/qrcode', {})
-      // 生成扫码确认页面的 URL（替换 localhost 为局域网 IP）
+      // 生成扫码确认页面的 URL
       let origin = window.location.origin
-      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-        // 开发环境提示：需要手机和电脑在同一局域网
-        // 可通过环境变量 VITE_PUBLIC_URL 配置公网地址
-        const publicUrl = import.meta.env.VITE_PUBLIC_URL
-        if (publicUrl) {
-          origin = publicUrl
-        }
+      const publicUrl = import.meta.env.VITE_PUBLIC_URL
+      if (publicUrl) {
+        origin = publicUrl
       }
       const confirmUrl = `${origin}/scan-confirm?ticket=${res.ticket}`
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(confirmUrl)}`
-      console.log('扫码确认地址:', confirmUrl)
       setQrCodeUrl(qrUrl)
       setTicket(res.ticket)
       setPolling(true)
@@ -123,6 +138,16 @@ export default function Login() {
         >
           刷新二维码
         </Button>
+        {isDev && (
+          <Button
+            type="primary"
+            style={{ marginLeft: 8 }}
+            onClick={devLogin}
+            loading={loading}
+          >
+            开发模式登录
+          </Button>
+        )}
         <div style={{ marginTop: 16, color: '#999', fontSize: 12 }}>
           二维码有效期 5 分钟
         </div>

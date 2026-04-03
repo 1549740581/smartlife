@@ -36,6 +36,11 @@ page {
   margin-bottom: 10rpx;
 }
 
+.required {
+  color: #ef4444;
+  margin-right: 4rpx;
+}
+
 .input,
 .readonly-field,
 .picker-value {
@@ -144,6 +149,11 @@ page {
 .status-approved {
   background: #dcfce7;
   color: #15803d;
+}
+
+.status-draft {
+  background: #e0e7ff;
+  color: #4338ca;
 }
 
 .status-pending {

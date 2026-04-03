@@ -6,7 +6,9 @@ import com.yxtech.smartlife.common.Result;
 import com.yxtech.smartlife.dto.AdminRentalDTO;
 import com.yxtech.smartlife.dto.ReviewRentalRequest;
 import com.yxtech.smartlife.entity.Admin;
+import com.yxtech.smartlife.entity.HouseDetail;
 import com.yxtech.smartlife.entity.RentalInfo;
+import com.yxtech.smartlife.repository.HouseDetailRepository;
 import com.yxtech.smartlife.service.RentalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.util.List;
 public class AdminRentalController {
 
     private final RentalService rentalService;
+    private final HouseDetailRepository houseDetailRepository;
     private final ObjectMapper objectMapper;
 
     @GetMapping("/pending")
@@ -43,7 +46,12 @@ public class AdminRentalController {
 
     @GetMapping("/{id}")
     public Result<AdminRentalDTO> getRentalDetail(@PathVariable("id") Long id) {
-        return Result.success(AdminRentalDTO.fromEntity(rentalService.findRentalById(id), objectMapper));
+        RentalInfo rental = rentalService.findRentalById(id);
+        HouseDetail houseDetail = null;
+        if (rental.getRentalType() == RentalInfo.RentalType.HOUSE) {
+            houseDetail = houseDetailRepository.findByRentalInfoIdAndDeletedFalse(rental.getId()).orElse(null);
+        }
+        return Result.success(AdminRentalDTO.fromEntity(rental, houseDetail, objectMapper));
     }
 
     @PostMapping("/{id}/review")

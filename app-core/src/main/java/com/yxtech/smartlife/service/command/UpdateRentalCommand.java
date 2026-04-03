@@ -9,8 +9,9 @@ import java.util.List;
 
 @Value
 @Builder
-public class CreateRentalCommand {
-    Long publisherUserId;
+public class UpdateRentalCommand {
+    Long rentalId;
+    Long userId;
     RentalInfo.RentalType rentalType;
     String title;
     String description;

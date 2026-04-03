@@ -10,10 +10,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class CreateRentalRequest {
+public class UpdateRentalRequest {
 
     @NotNull
-    private Long publisherUserId;
+    private Long userId;
 
     @NotNull
     private RentalInfo.RentalType rentalType;

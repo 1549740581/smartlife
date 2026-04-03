@@ -2,6 +2,7 @@ package com.yxtech.smartlife.dto;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yxtech.smartlife.entity.HouseDetail;
 import com.yxtech.smartlife.entity.RentalInfo;
 import lombok.Data;
 
@@ -35,8 +36,13 @@ public class RentalDTO {
     private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private HouseDetailDTO houseDetail;
 
     public static RentalDTO fromEntity(RentalInfo rentalInfo, ObjectMapper objectMapper) {
+        return fromEntity(rentalInfo, null, objectMapper);
+    }
+
+    public static RentalDTO fromEntity(RentalInfo rentalInfo, HouseDetail houseDetail, ObjectMapper objectMapper) {
         RentalDTO dto = new RentalDTO();
         dto.setId(rentalInfo.getId());
         dto.setPublisherUserId(rentalInfo.getPublisherUserId());
@@ -59,6 +65,7 @@ public class RentalDTO {
         dto.setReviewedAt(rentalInfo.getReviewedAt());
         dto.setCreatedAt(rentalInfo.getCreatedAt());
         dto.setUpdatedAt(rentalInfo.getUpdatedAt());
+        dto.setHouseDetail(HouseDetailDTO.fromEntity(houseDetail, objectMapper));
         return dto;
     }
 

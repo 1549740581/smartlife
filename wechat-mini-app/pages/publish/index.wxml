@@ -12,33 +12,33 @@
       <view class="meta helper-text">当前版本固定为杭州，后续再支持多城市联动选择。</view>
     </view>
     <view class="field">
-      <text class="label">类型</text>
+      <text class="label"><text class="required">*</text>类型</text>
       <picker class="picker-field" mode="selector" range="{{typeOptions}}" range-key="label" bindchange="onTypeChange">
         <view class="picker-value">{{typeOptions[typeIndex].label}}</view>
       </picker>
     </view>
     <view class="field">
-      <text class="label">标题</text>
+      <text class="label"><text class="required">*</text>标题</text>
       <input class="input" placeholder="例如：地铁口两居室整租 / 地下固定车位转租" maxlength="40" bindinput="bindField" data-field="title" value="{{form.title}}" />
     </view>
     <view class="field">
-      <text class="label">描述</text>
+      <text class="label"><text class="required">*</text>描述</text>
       <textarea class="textarea" placeholder="补充房屋配置、停车位置、物品成色、交易方式等关键信息" maxlength="300" bindinput="bindField" data-field="description" value="{{form.description}}" />
     </view>
     <view class="field">
-      <text class="label">价格</text>
+      <text class="label"><text class="required">*</text>价格</text>
       <input class="input" type="digit" placeholder="请输入金额，例如 1500" bindinput="bindField" data-field="price" value="{{form.price}}" />
     </view>
     <view class="field">
-      <text class="label">联系人</text>
+      <text class="label"><text class="required">*</text>联系人</text>
       <input class="input" placeholder="请输入联系人姓名" maxlength="20" bindinput="bindField" data-field="contactName" value="{{form.contactName}}" />
     </view>
     <view class="field">
-      <text class="label">联系电话</text>
+      <text class="label"><text class="required">*</text>联系电话</text>
       <input class="input" type="number" placeholder="请输入手机号或常用联系电话" maxlength="20" bindinput="bindField" data-field="contactPhone" value="{{form.contactPhone}}" />
     </view>
     <view class="field">
-      <text class="label">区县 / 街道 / 小区</text>
+      <text class="label"><text class="required">*</text>区县 / 街道 / 小区</text>
       <picker
         class="picker-field"
         mode="multiSelector"
@@ -50,6 +50,76 @@
         <view class="picker-value location-picker">{{selectedAddressText}}</view>
       </picker>
     </view>
+
+    <!-- 房屋详情字段，仅在类型为房屋时显示 -->
+    <block wx:if="{{typeOptions[typeIndex].value === 'HOUSE'}}">
+      <view class="section-divider">
+        <text class="section-title">房屋详情</text>
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>楼层</text>
+        <input class="input" type="number" placeholder="0~40" bindinput="bindHouseField" data-field="floor" value="{{houseDetail.floor}}" />
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>户型</text>
+        <view class="layout-row">
+          <input class="input input-small" type="number" placeholder="0" bindinput="bindHouseField" data-field="bedroomCount" value="{{houseDetail.bedroomCount}}" />
+          <text class="layout-label">室</text>
+          <input class="input input-small" type="number" placeholder="0" bindinput="bindHouseField" data-field="livingRoomCount" value="{{houseDetail.livingRoomCount}}" />
+          <text class="layout-label">厅</text>
+          <input class="input input-small" type="number" placeholder="0" bindinput="bindHouseField" data-field="kitchenCount" value="{{houseDetail.kitchenCount}}" />
+          <text class="layout-label">厨</text>
+          <input class="input input-small" type="number" placeholder="0" bindinput="bindHouseField" data-field="bathroomCount" value="{{houseDetail.bathroomCount}}" />
+          <text class="layout-label">卫</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>朝向</text>
+        <picker class="picker-field" mode="selector" range="{{orientationOptions}}" range-key="label" bindchange="onOrientationChange">
+          <view class="picker-value">{{orientationOptions[orientationIndex].label}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>阳台</text>
+        <picker class="picker-field" mode="selector" range="{{balconyOptions}}" range-key="label" bindchange="onBalconyChange">
+          <view class="picker-value">{{balconyOptions[balconyIndex].label}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>家电家具</text>
+        <view class="checkbox-group">
+          <block wx:for="{{applianceOptions}}" wx:key="value">
+            <view class="checkbox-item {{item.checked ? 'checked' : ''}}" data-value="{{item.value}}" bindtap="toggleAppliance">
+              <text>{{item.label}}</text>
+            </view>
+          </block>
+        </view>
+        <view class="meta helper-text">选择"无"时不能选择其他选项</view>
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>电梯</text>
+        <picker class="picker-field" mode="selector" range="{{elevatorOptions}}" range-key="label" bindchange="onElevatorChange">
+          <view class="picker-value">{{elevatorOptions[elevatorIndex].label}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>物业费（元/月）</text>
+        <input class="input" type="digit" placeholder="可输入0" bindinput="bindHouseField" data-field="propertyFee" value="{{houseDetail.propertyFee}}" />
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>水费（元/吨）</text>
+        <input class="input" type="digit" placeholder="请输入水费单价" bindinput="bindHouseField" data-field="waterFee" value="{{houseDetail.waterFee}}" />
+      </view>
+      <view class="field">
+        <text class="label"><text class="required">*</text>电费（元/度）</text>
+        <input class="input" type="digit" placeholder="请输入电费单价" bindinput="bindHouseField" data-field="electricityFee" value="{{houseDetail.electricityFee}}" />
+      </view>
+      <view class="field">
+        <text class="label">其他信息</text>
+        <textarea class="textarea" placeholder="可填写其他需要说明的信息（选填）" maxlength="500" bindinput="bindHouseField" data-field="extraInfo" value="{{houseDetail.extraInfo}}" />
+      </view>
+    </block>
+
     <view class="field">
       <text class="label">图片</text>
       <button class="button button-secondary" loading="{{uploading}}" bindtap="chooseImages">
@@ -65,7 +135,10 @@
         </block>
       </view>
     </view>
-    <button class="button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">{{submitting ? '提交中...' : '提交审核'}}</button>
+    <view class="button-group">
+      <button class="button button-secondary" loading="{{savingDraft}}" disabled="{{savingDraft || submitting}}" bindtap="saveDraft">{{savingDraft ? '保存中...' : '保存草稿'}}</button>
+      <button class="button" loading="{{submitting}}" disabled="{{submitting || savingDraft}}" bindtap="submit">{{submitting ? '提交中...' : '提交审核'}}</button>
+    </view>
   </view>
 
   <view class="note-card">

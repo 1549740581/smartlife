@@ -55,6 +55,13 @@
 - 状态字段采用枚举值，不使用魔法数字
 - 结构变更通过 Liquibase 管理
 - 新库初始化优先维护 Liquibase baseline，避免长期堆积大量一次性历史 SQL
+- 数据库建表语句禁止使用外键约束，关联字段在comment 中通过ref:table_name.字段名来描述关联关系
+- 数据库建表语语句字段和表必须包含comment
+- 数据库建表语句必须指定ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC
+- 数据库字段布尔类型禁止使用bit类型使用tinyint代替
+- 数据库字段如果保存的是json数据，字段类型使用Mysql8 支持的JSON类型
+- 主键字段类型必须是bigint unsigned
+- 每个表必须有version字段类型bigint unsigned
 
 ## 6. 异常与日志
 

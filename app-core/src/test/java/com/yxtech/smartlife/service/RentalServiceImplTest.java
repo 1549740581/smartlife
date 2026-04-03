@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yxtech.smartlife.entity.RentalInfo;
 import com.yxtech.smartlife.entity.ReviewRecord;
 import com.yxtech.smartlife.entity.User;
+import com.yxtech.smartlife.repository.HouseDetailRepository;
 import com.yxtech.smartlife.repository.RentalInfoRepository;
 import com.yxtech.smartlife.repository.ReviewRecordRepository;
 import com.yxtech.smartlife.repository.UserRepository;
@@ -34,6 +35,9 @@ class RentalServiceImplTest {
     private RentalInfoRepository rentalInfoRepository;
 
     @Mock
+    private HouseDetailRepository houseDetailRepository;
+
+    @Mock
     private ReviewRecordRepository reviewRecordRepository;
 
     @Mock
@@ -48,6 +52,7 @@ class RentalServiceImplTest {
     void setUp() {
         rentalService = new RentalServiceImpl(
                 rentalInfoRepository,
+                houseDetailRepository,
                 reviewRecordRepository,
                 userRepository,
                 addressService,

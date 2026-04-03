@@ -2,12 +2,15 @@ package com.yxtech.smartlife.service;
 
 import com.yxtech.smartlife.entity.RentalInfo;
 import com.yxtech.smartlife.service.command.CreateRentalCommand;
+import com.yxtech.smartlife.service.command.UpdateRentalCommand;
 
 import java.util.List;
 
 public interface RentalService {
 
     RentalInfo createRental(CreateRentalCommand command);
+
+    RentalInfo updateRental(UpdateRentalCommand command);
 
     List<RentalInfo> findPublicRentals();
 

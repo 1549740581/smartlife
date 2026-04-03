@@ -56,7 +56,7 @@
 
 - `POST /api/rentals`
 
-请求示例：
+请求示例（房屋类型）：
 
 ```json
 {
@@ -73,7 +73,22 @@
   "communityName": "卓悦华庭",
   "imageUrls": [
     "https://example.com/image-1.jpg"
-  ]
+  ],
+  "houseDetail": {
+    "floor": 12,
+    "bedroomCount": 2,
+    "livingRoomCount": 1,
+    "kitchenCount": 1,
+    "bathroomCount": 1,
+    "orientation": "SOUTH",
+    "hasBalcony": true,
+    "appliances": ["REFRIGERATOR", "TV", "AIR_CONDITIONER"],
+    "hasElevator": true,
+    "propertyFee": 2.5,
+    "waterFee": 5.0,
+    "electricityFee": 0.6,
+    "extraInfo": "可养小型宠物"
+  }
 }
 ```
 
@@ -84,6 +99,23 @@
 - 小程序发布页会在调用接口前进行标题、描述、价格、联系人、联系电话的前端校验
 - 发布地址必须命中地址表中存在的地址组合
 - 当前 `city` 仅支持 `杭州`
+- `houseDetail` 仅在 `rentalType=HOUSE` 时必填，车位和闲置物品不需要
+
+房屋详情字段说明：
+
+- `floor`：楼层，0~40，必填
+- `bedroomCount`：几室，≥0，必填
+- `livingRoomCount`：几厅，≥0，必填
+- `kitchenCount`：几厨，≥0，必填
+- `bathroomCount`：几卫，≥0，必填
+- `orientation`：朝向，枚举值 `EAST`/`SOUTH`/`WEST`/`NORTH`/`SOUTHEAST`/`SOUTHWEST`/`NORTHEAST`/`NORTHWEST`，必填
+- `hasBalcony`：有无阳台，必填
+- `appliances`：家电家具，数组，可选值 `REFRIGERATOR`/`TV`/`AIR_CONDITIONER`/`WASHING_MACHINE`/`WARDROBE`/`NONE`，选 `NONE` 时不可选其他，必填
+- `hasElevator`：有无电梯，必填
+- `propertyFee`：物业费（元/月），≥0，必填
+- `waterFee`：水费（元/吨），必填
+- `electricityFee`：电费（元/度），必填
+- `extraInfo`：其他信息，非必填
 
 ### 地址树查询
 
